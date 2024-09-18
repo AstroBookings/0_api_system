@@ -12,6 +12,7 @@ export class AuthenticationController {
 
   /**
    * Ping endpoint to check if the authentication service is running
+   *
    * 📦 'pong' if the controller is running
    */
   @Get('ping')
@@ -29,7 +30,6 @@ export class AuthenticationController {
    *  exp: number;
    * }
    */
-
   @Post('register')
   async register(@Body() registerDto: RegisterDto): Promise<UserTokenDto> {
     this.#logger.verbose(`Registering user: ${registerDto.email}`);
@@ -40,7 +40,7 @@ export class AuthenticationController {
         email: registerDto.email,
         role: registerDto.role,
       },
-      token: '1234567890',
+      token: 'abc123',
       exp: 1234567890,
     };
   }
@@ -52,6 +52,7 @@ export class AuthenticationController {
    *  user: LoginDto;
    *  token: string;
    *  exp: number;
+   * }
    */
   @Post('login')
   async login(@Body() loginDto: LoginDto): Promise<UserTokenDto> {
@@ -63,7 +64,7 @@ export class AuthenticationController {
         email: loginDto.email,
         role: 'traveler',
       },
-      token: '1234567890',
+      token: 'abc123',
       exp: 1234567890,
     };
   }

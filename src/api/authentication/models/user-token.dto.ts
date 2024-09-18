@@ -6,23 +6,18 @@ import { User } from './user.type';
 export class UserTokenDto {
   /**
    * The user object
-   * @example {
-   *  id: 'user-1',
-   *  name: 'John Doe',
-   *  email: 'john.doe@example.com',
-   *  role: 'traveler'
-   * }
+   * @example { id: 'user-1', name: 'John Doe', email: 'john.doe@example.com', role: 'traveler' }
    */
   user: User;
 
   /**
-   * The token
+   * The JWT token
    * @example 'abc123'
    */
   token: string;
 
   /**
-   * The expiration date of the token
+   * The expiration date of the token in milliseconds
    * @example 1234567890
    */
   exp: number;
