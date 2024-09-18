@@ -10,6 +10,6 @@
 8. The timestamp should be HH:MM:SS and dim italic
 9. The context should be in square brackets and red for errors, yellow for warnings, green for logs and cyan for others
 10. The message for low level logs should be in dim , otherwise reset
-11. Add logger: new LogService(new ConfigService()), to the AppConfig at core/app.config.ts
+11. Add logger: new LogService(new ConfigService()), to the NestFactory at main.ts
 12. Use the logger at main.ts to log the port number and log level at the start of the app
 13. Add LOG_LEVEL=debug to the all env files

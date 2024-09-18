@@ -50,12 +50,6 @@ export const CONFIG_OPTIONS = {
   isGlobal: true,
   cache: true,
 };
-/**
- * Nest app options
- */
-export const NEST_APP_OPTIONS = {
-  cors: true,
-};
 ```
 
 3. Configure `AppModule` to use `ConfigModule` with `CONFIG_OPTIONS`.
