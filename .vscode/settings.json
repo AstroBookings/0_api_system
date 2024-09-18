@@ -1,0 +1,16 @@
+{
+  "workbench.colorCustomizations": {
+    "commandCenter.activeBorder": "#33c1ee",
+    "commandCenter.inactiveBorder": "#33c1ee",
+    "editorCursor.foreground": "#33c1ee",
+    "inlineChat.border": "#33c1ee",
+    "menu.border": "#33c1ee",
+    "sideBar.border": "#33c1ee",
+    "statusBar.border": "#33c1ee",
+    "tab.activeBorder": "#33c1ee",
+    "tab.activeBorderTop": "#33c1ee",
+    "terminalCursor.foreground": "#33c1ee",
+    "titleBar.inactiveBackground": "#33c1ee",
+    "tree.indentGuidesStroke": "#33c1ee"
+  }
+}

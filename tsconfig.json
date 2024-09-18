@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "strictBindCallApply": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@ab/api/*": ["src/api/*"],
+      "@ab/core/*": ["src/core/*"],
+      "@ab/shared/*": ["src/shared/*"],
+      "@ab/log/*": ["src/core/log/*"],
+      "@ab/utils/*": ["src/shared/utils/*"],
+      "@ab/auth/*": ["src/shared/auth/*"],
+      "@ab/*": ["src/*"] // Added general path for all modules
+    }
+  }
+}
