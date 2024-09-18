@@ -1,6 +1,3 @@
-import { ConfigService } from '@nestjs/config';
-import { LogService } from './log/log.service';
-
 const envFilePath =
   process.env.NODE_ENV === 'production' ? '.env' : '.env.local';
 
@@ -11,11 +8,4 @@ export const CONFIG_OPTIONS = {
   envFilePath,
   isGlobal: true,
   cache: true,
-};
-/**
- * Nest app options to be used in `main.ts`
- */
-export const NEST_APP_OPTIONS = {
-  cors: true,
-  logger: new LogService(new ConfigService()),
 };

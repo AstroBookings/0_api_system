@@ -1,6 +1,7 @@
 import { convertToKB } from '@ab/utils/size-converter.util';
 import { Logger } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
+import { wrapStatusWithColor } from './log-colors.util';
 
 /**
  * Function middleware to log the request and response
@@ -13,27 +14,11 @@ export function logMiddleware(req: Request, res: Response, next: NextFunction) {
 
   res.on('finish', () => {
     const statusCode: number = res.statusCode;
-    // ToDo: refactor this in a function
-    const category =
-      statusCode >= 500
-        ? 'serverError'
-        : statusCode >= 400
-          ? 'clientError'
-          : 'success';
-    const colorMap: Record<string, string> = {
-      serverError: '\x1B[31m', // red
-      clientError: '\x1B[33m', // yellow
-      success: '\x1B[32m', // green
-      default: '\x1B[36m', // cyan
-    };
-    const color =
-      colorMap[category as keyof typeof colorMap] || colorMap.default;
-
-    const statusCodeChunk = `${color}${statusCode}\x1B[0m`;
+    const statusCodeChunk = wrapStatusWithColor(statusCode);
     const contentLength: number = parseInt(res.get('content-length') || '0');
     const contentKb = convertToKB(contentLength);
     const message = `${method} ${originalUrl} ${statusCodeChunk} ${contentKb}`;
-    new Logger('HTTP').log(message);
+    new Logger('HTTP').verbose(message);
   });
 
   next();
