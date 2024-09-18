@@ -24,7 +24,9 @@ Generate code, corrections, and refactorings that comply with the basic principl
   - avoid use of `null`.
   - reduce the use of `undefined`.
   - create the necessary types.
+- Dont add line comments, the code should be self explanatory.
 - Use **JSDoc** to document public surface for classes and modules.
+- Do not document private members.
 - Don't leave blank lines within a function or method.
 - One export per file.
 
