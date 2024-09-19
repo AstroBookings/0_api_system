@@ -56,6 +56,11 @@ export function wrapMessageWithColor(message: string, level: LogLevel): string {
   return wrapWithColor(message, COLOR_CODES.dim); // Apply dim color to low level message
 }
 
+/**
+ * Wraps the status code with the corresponding color
+ * @param statusCode - The status code to wrap
+ * @returns Text with the status code wrapped with the corresponding color
+ */
 export function wrapStatusWithColor(statusCode: number): string {
   const color = getColorForStatusCode(statusCode); // Get color based on status code
   return wrapWithColor(statusCode.toString(), color); // Wrap status code with the corresponding color

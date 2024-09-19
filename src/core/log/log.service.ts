@@ -7,15 +7,17 @@ import {
 } from './log-colors.util';
 
 /**
- * LogService implements custom logging with formatted messages.
+ * Custom logging implementation of the LoggerService interface
+ * @description To be used in the main.ts file during the app bootstrap
  */
 @Injectable()
 export class LogService implements LoggerService {
   private readonly logLevel: LogLevel;
 
   constructor(private readonly configService: ConfigService) {
-    this.logLevel =
-      (this.configService.get<string>('LOG_LEVEL') as LogLevel) || 'log';
+    const logLevel = this.configService.get<string>('LOG_LEVEL') as LogLevel;
+    this.logLevel = logLevel || 'log';
+    this.log(`Current log level: ${this.logLevel}`, 'LogService');
   }
 
   error(message: string, context?: string): void {

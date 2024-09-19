@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Logger, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Logger, Post } from '@nestjs/common';
 import { LoginDto } from './models/login.dto';
 import { RegisterDto } from './models/register.dto';
 import { UserTokenDto } from './models/user-token.dto';
@@ -6,7 +6,7 @@ import { UserTokenDto } from './models/user-token.dto';
 /**
  * Authentication controller for handling user registration and login
  */
-@Controller('auth')
+@Controller('api/authentication')
 export class AuthenticationController {
   readonly #logger = new Logger(AuthenticationController.name);
 
@@ -55,6 +55,7 @@ export class AuthenticationController {
    * }
    */
   @Post('login')
+  @HttpCode(200)
   async login(@Body() loginDto: LoginDto): Promise<UserTokenDto> {
     this.#logger.verbose(`Logging in user: ${loginDto.email}`);
     return {

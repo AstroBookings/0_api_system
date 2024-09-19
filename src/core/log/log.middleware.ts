@@ -5,6 +5,7 @@ import { wrapStatusWithColor } from './log-colors.util';
 
 /**
  * Function middleware to log the request and response
+ * @description To be used in the main.ts file
  * @param req - The Request being processed
  * @param res - The Response being issued
  * @param next - The NextFunction to call to continue processing
@@ -14,10 +15,10 @@ export function logMiddleware(req: Request, res: Response, next: NextFunction) {
 
   res.on('finish', () => {
     const statusCode: number = res.statusCode;
-    const statusCodeChunk = wrapStatusWithColor(statusCode);
+    const statusCodeText = wrapStatusWithColor(statusCode);
     const contentLength: number = parseInt(res.get('content-length') || '0');
-    const contentKb = convertToKB(contentLength);
-    const message = `${method} ${originalUrl} ${statusCodeChunk} ${contentKb}`;
+    const contentKbText = convertToKB(contentLength);
+    const message = `${method} ${originalUrl} ${statusCodeText} ${contentKbText}`;
     new Logger('HTTP').verbose(message);
   });
 
