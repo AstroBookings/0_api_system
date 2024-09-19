@@ -1,4 +1,13 @@
-import { Body, Controller, Get, HttpCode, Logger, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Logger,
+  Post,
+} from '@nestjs/common';
+import { AuthenticationService } from './authentication.service';
 import { LoginDto } from './models/login.dto';
 import { RegisterDto } from './models/register.dto';
 import { UserTokenDto } from './models/user-token.dto';
@@ -10,6 +19,7 @@ import { UserTokenDto } from './models/user-token.dto';
 export class AuthenticationController {
   readonly #logger = new Logger(AuthenticationController.name);
 
+  constructor(private readonly authenticationService: AuthenticationService) {}
   /**
    * Ping endpoint to check if the authentication service is running
    *
@@ -33,16 +43,7 @@ export class AuthenticationController {
   @Post('register')
   async register(@Body() registerDto: RegisterDto): Promise<UserTokenDto> {
     this.#logger.verbose(`Registering user: ${registerDto.email}`);
-    return {
-      user: {
-        id: 'user-1',
-        name: registerDto.name,
-        email: registerDto.email,
-        role: registerDto.role,
-      },
-      token: 'abc123',
-      exp: 1234567890,
-    };
+    return this.authenticationService.register(registerDto);
   }
 
   /**
@@ -58,15 +59,17 @@ export class AuthenticationController {
   @HttpCode(200)
   async login(@Body() loginDto: LoginDto): Promise<UserTokenDto> {
     this.#logger.verbose(`Logging in user: ${loginDto.email}`);
-    return {
-      user: {
-        id: 'user-1',
-        name: 'John Doe',
-        email: loginDto.email,
-        role: 'traveler',
-      },
-      token: 'abc123',
-      exp: 1234567890,
-    };
+    return this.authenticationService.login(loginDto);
+  }
+
+  /**
+   * Delete a user
+   *
+   * 📦 void
+   */
+  @Delete('user')
+  async delete(@Body() loginDto: LoginDto): Promise<void> {
+    this.#logger.verbose(`Deleting user: ${loginDto.email}`);
+    return this.authenticationService.delete(loginDto);
   }
 }

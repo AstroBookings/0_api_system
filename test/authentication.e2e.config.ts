@@ -22,3 +22,13 @@ export const unprocessableLoginUser: LoginDto = {
   email: 'non.valid.test.dev',
   password: inputRegisterUser.password,
 };
+
+export const unauthorizedLoginUser: LoginDto = {
+  email: 'unauthorized@test.dev',
+  password: inputRegisterUser.password,
+};
+
+export const unauthorizedLoginPassword: LoginDto = {
+  email: inputRegisterUser.email,
+  password: 'invalidPassword',
+};
