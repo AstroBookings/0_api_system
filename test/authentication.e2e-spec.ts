@@ -23,9 +23,7 @@ describe('The api/authentication endpoint', () => {
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    })
-      .setLogger(console)
-      .compile();
+    }).compile();
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe(validationPipeOptions));
     await app.init();
