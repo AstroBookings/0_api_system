@@ -1,11 +1,10 @@
+import { AdminModule } from '@ab/api/admin/admin.module';
+import { AuthenticationModule } from '@ab/api/authentication/authentication.module';
+import { envFilePath } from '@ab/core/app-bootstrap.util';
+import { LogModule } from '@ab/core/log/log.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AdminModule } from './api/admin/admin.module';
-import { AuthenticationModule } from './api/authentication/authentication.module';
-import { LogModule } from './core/log/log.module';
 
-const envFilePath =
-  process.env.NODE_ENV === 'production' ? '.env' : '.env.local';
 const CONFIG_OPTIONS = {
   envFilePath,
   isGlobal: true,
@@ -16,6 +15,10 @@ const configModule = ConfigModule.forRoot(CONFIG_OPTIONS);
 const coreModules = [LogModule];
 const apiModules = [AdminModule, AuthenticationModule];
 
+/**
+ * The root module of the application.
+ * @description Imports core and API modules.
+ */
 @Module({
   imports: [configModule, ...coreModules, ...apiModules],
 })

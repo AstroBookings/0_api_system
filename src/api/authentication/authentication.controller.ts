@@ -7,10 +7,10 @@ import {
   Logger,
   Post,
 } from '@nestjs/common';
-import { AuthenticationService } from './authentication.service';
 import { LoginDto } from './models/login.dto';
 import { RegisterDto } from './models/register.dto';
 import { UserTokenDto } from './models/user-token.dto';
+import { AuthenticationService } from './providers/authentication.service';
 
 /**
  * Authentication controller for handling user registration and login

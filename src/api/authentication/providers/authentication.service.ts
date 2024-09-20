@@ -1,27 +1,29 @@
 import { hashText, isValid } from '@ab/shared/utils/hash.util';
 import { generateId } from '@ab/shared/utils/id.util';
-import {
-  ConflictException,
-  Injectable,
-  Logger,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { LoginDto } from './models/login.dto';
-import { RegisterDto } from './models/register.dto';
-import { UserTokenDto } from './models/user-token.dto';
-import { UserEntity } from './models/user.entity';
+import { ConflictException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { LoginDto } from '../models/login.dto';
+import { RegisterDto } from '../models/register.dto';
+import { UserTokenDto } from '../models/user-token.dto';
+import { UserEntity } from '../models/user.entity';
+import { UserRepository } from './user.repository';
 
+/**
+ * Service for the authentication logic
+ */
 @Injectable()
 export class AuthenticationService {
-  static readonly users: UserEntity[] = [];
   private readonly logger = new Logger(AuthenticationService.name);
+  constructor(private readonly userRepository: UserRepository) {}
 
+  /**
+   * Register a new user
+   * @param registerDto - The user to register
+   * @returns The user token
+   */
   async register(registerDto: RegisterDto): Promise<UserTokenDto> {
-    const userExists = AuthenticationService.users.find(
-      (u) => u.email === registerDto.email,
-    );
+    const userExists = await this.userRepository.findByEmail(registerDto.email);
     if (userExists) {
-      this.logger.error(`User already exists: ${registerDto.email}`);
+      this.logger.warn(`User already exists: ${registerDto.email}`);
       throw new ConflictException('User already exists');
     }
     const newUserEntity = new UserEntity(
@@ -31,42 +33,45 @@ export class AuthenticationService {
       registerDto.role,
       hashText(registerDto.password),
     );
-    AuthenticationService.users.push(newUserEntity);
+    await this.userRepository.save(newUserEntity);
     return this.createUserToken(newUserEntity);
   }
 
+  /**
+   * Login a user
+   * @param loginDto - The user to login
+   * @returns The user token
+   */
   async login(loginDto: LoginDto): Promise<UserTokenDto> {
-    const user = AuthenticationService.users.find(
-      (u) => u.email === loginDto.email,
-    );
+    const user = await this.userRepository.findByEmail(loginDto.email);
     if (!user) {
       this.logger.debug(`User not found: ${loginDto.email}`);
       throw new UnauthorizedException(`Unauthorized user: ${loginDto.email}`);
     }
     const isValidPassword = isValid(loginDto.password, user.password);
     if (!isValidPassword) {
-      this.logger.error(`Invalid password for user: ${loginDto.email}`);
+      this.logger.debug(`Invalid password for user: ${loginDto.email}`);
       throw new UnauthorizedException(`Unauthorized user: ${loginDto.email}`);
     }
     return this.createUserToken(user);
   }
 
+  /**
+   * Delete a user
+   * @param loginDto - The user to delete
+   */
   async delete(loginDto: LoginDto): Promise<void> {
-    const user = AuthenticationService.users.find(
-      (u) => u.email === loginDto.email,
-    );
+    const user = await this.userRepository.findByEmail(loginDto.email);
     if (!user) {
       this.logger.debug(`User not found: ${loginDto.email}`);
       throw new UnauthorizedException(`Unauthorized user: ${loginDto.email}`);
     }
-    if (!isValid(loginDto.password, user.password)) {
-      this.logger.error(`Invalid password for user: ${loginDto.email}`);
+    const isValidPassword = isValid(loginDto.password, user.password);
+    if (!isValidPassword) {
+      this.logger.debug(`Invalid password for user: ${loginDto.email}`);
       throw new UnauthorizedException(`Unauthorized user: ${loginDto.email}`);
     }
-    AuthenticationService.users.splice(
-      AuthenticationService.users.indexOf(user),
-      1,
-    );
+    await this.userRepository.delete(user);
   }
 
   private createUserToken(user: UserEntity): UserTokenDto {

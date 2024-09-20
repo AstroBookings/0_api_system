@@ -1,7 +1,5 @@
 # Create a new NestJS application
 
-You are a senior NestJS developer. You are tasked with creating a new app.
-
 ## Instructions
 
 1. Ask for the app name.

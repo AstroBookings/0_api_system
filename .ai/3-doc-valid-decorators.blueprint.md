@@ -19,19 +19,23 @@
 }
 ```
 
-- configure documentation builder at `src/core/app/app.config.ts`
+- configure documentation builder at `src/core/app/app.bootstrap.ts`
 
 ```ts
-export const documentationBuilder = (app: INestApplication) => {
+export const documentationBuilder = (
+  app: INestApplication,
+  appConfig: AppConfig,
+  logger: LogService,
+) => {
   const config = new DocumentBuilder()
     .addBearerAuth()
-    .setTitle('🚀 AstroBookings 👔 Notify API')
-    .setDescription('The API to save and send notifications to users.')
-    //.setVersion('1')
+    .setTitle(appConfig.appTitle)
+    .setDescription(appConfig.appDescription)
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
+  logger.log(`📚 ${appConfig.host}:${appConfig.port}/docs`, 'Bootstrap');
 };
 ```
 
@@ -40,6 +44,10 @@ export const documentationBuilder = (app: INestApplication) => {
 ```ts
 documentationBuilder(app);
 ```
+
+Add JSDoc comments to the DTOs and controllers to document the API.
+
+View the documentation at `http://localhost:3000/docs`.
 
 ## Validation
 

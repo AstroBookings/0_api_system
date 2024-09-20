@@ -14,11 +14,11 @@ import * as request from 'supertest';
 import TestAgent from 'supertest/lib/agent';
 import { AppModule } from '../src/app.module';
 
-describe('The api/authentication endpoint', () => {
+describe('/api/authentication', () => {
   let app: INestApplication;
   let http: TestAgent;
   // Arrange Endpoints
-  const authenticationEndPoint: string = '/api/authentication';
+  const authenticationUrl: string = '/api/authentication';
   // Arrange Setup
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -33,7 +33,7 @@ describe('The api/authentication endpoint', () => {
   describe('GET  /ping', () => {
     it('should return pong', async () => {
       // Arrange
-      const pingUrl = `${authenticationEndPoint}/ping`;
+      const pingUrl = `${authenticationUrl}/ping`;
       // Act & Assert
       await http.get(pingUrl).expect(200).expect('pong');
     });
@@ -41,80 +41,57 @@ describe('The api/authentication endpoint', () => {
 
   describe('POST /register', () => {
     beforeEach(async () => {
-      await http
-        .delete(`${authenticationEndPoint}/user`)
-        .send(inputRegisterUser);
+      // Arrange : clean up the state before each test
+      await http.delete(`${authenticationUrl}/user`).send(inputRegisterUser);
     });
     it('should return 201 for valid input', async () => {
       // Act & Assert
-      await http
-        .post(`${authenticationEndPoint}/register`)
-        .send(inputRegisterUser)
-        .expect(201);
+      await http.post(`${authenticationUrl}/register`).send(inputRegisterUser).expect(201);
     });
     it('should return 422 for unprocessable entity', async () => {
       // Act & Assert
-      await http
-        .post(`${authenticationEndPoint}/register`)
-        .send(unprocessableRegisterUser)
-        .expect(422);
+      await http.post(`${authenticationUrl}/register`).send(unprocessableRegisterUser).expect(422);
+    });
+    it('should return 409 for duplicate user', async () => {
+      // Arrange : force the creation of a user
+      await http.post(`${authenticationUrl}/register`).send(inputRegisterUser).expect(201);
+      // Act & Assert
+      await http.post(`${authenticationUrl}/register`).send(inputRegisterUser).expect(409);
     });
   });
 
   describe('POST /login', () => {
     beforeEach(async () => {
-      await http
-        .delete(`${authenticationEndPoint}/user`)
-        .send(inputRegisterUser);
+      // Arrange : clean up the state before each test
+      await http.delete(`${authenticationUrl}/user`).send(inputRegisterUser);
     });
     it('should return 200 for valid input', async () => {
-      // Arrange
-      await http
-        .post(`${authenticationEndPoint}/register`)
-        .send(inputRegisterUser)
-        .expect(201);
+      // Arrange : force the creation of a user
+      await http.post(`${authenticationUrl}/register`).send(inputRegisterUser).expect(201);
       // Act & Assert
-      await http
-        .post(`${authenticationEndPoint}/login`)
-        .send(inputLoginUser)
-        .expect(200);
+      await http.post(`${authenticationUrl}/login`).send(inputLoginUser).expect(200);
     });
     it('should return 422 for unprocessable entity', async () => {
       // Act & Assert
-      await http
-        .post(`${authenticationEndPoint}/login`)
-        .send(unprocessableLoginUser)
-        .expect(422);
+      await http.post(`${authenticationUrl}/login`).send(unprocessableLoginUser).expect(422);
     });
     it('should return 401 for unauthorized email', async () => {
       // Act & Assert
-      await http
-        .post(`${authenticationEndPoint}/login`)
-        .send(unauthorizedLoginUser)
-        .expect(401);
+      await http.post(`${authenticationUrl}/login`).send(unauthorizedLoginUser).expect(401);
     });
     it('should return 401 for unauthorized password', async () => {
       // Arrange
-      await http
-        .post(`${authenticationEndPoint}/register`)
-        .send(inputRegisterUser)
-        .expect(201);
+      await http.post(`${authenticationUrl}/register`).send(inputRegisterUser).expect(201);
       // Act & Assert
-      await http
-        .post(`${authenticationEndPoint}/login`)
-        .send(unauthorizedLoginPassword)
-        .expect(401);
+      await http.post(`${authenticationUrl}/login`).send(unauthorizedLoginPassword).expect(401);
     });
     // should return a token
     it('should return a token', async () => {
       // Arrange
-      await http
-        .post(`${authenticationEndPoint}/register`)
-        .send(inputRegisterUser)
-        .expect(201);
+      await http.post(`${authenticationUrl}/register`).send(inputRegisterUser).expect(201);
       // Act & Assert
       await http
-        .post(`${authenticationEndPoint}/login`)
+        .post(`${authenticationUrl}/login`)
         .send(inputLoginUser)
         .expect(200)
         .expect((response) => {
