@@ -1,3 +1,4 @@
+import { TokenService } from '@ab/shared/token/token.service';
 import { hashText, isValid } from '@ab/shared/utils/hash.util';
 import { generateId } from '@ab/shared/utils/id.util';
 import { ConflictException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
@@ -13,7 +14,10 @@ import { UserRepository } from './user.repository';
 @Injectable()
 export class AuthenticationService {
   private readonly logger = new Logger(AuthenticationService.name);
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly tokenService: TokenService,
+  ) {}
 
   /**
    * Register a new user
@@ -75,10 +79,10 @@ export class AuthenticationService {
   }
 
   private createUserToken(user: UserEntity): UserTokenDto {
+    const token = this.tokenService.generateToken(user.id);
     return {
       user: user.toUser(),
-      token: 'abc123',
-      exp: 1234567890,
+      token,
     };
   }
 }

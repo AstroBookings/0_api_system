@@ -29,7 +29,7 @@ src/
   core/
     log/
   shared/
-    auth/
+    token/
     utils/
 ```
 

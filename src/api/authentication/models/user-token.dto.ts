@@ -15,10 +15,4 @@ export class UserTokenDto {
    * @example 'abc123'
    */
   token: string;
-
-  /**
-   * The expiration date of the token in milliseconds
-   * @example 1234567890
-   */
-  exp: number;
 }

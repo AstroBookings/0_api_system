@@ -1,3 +1,4 @@
+import { TokenService } from '@ab/shared/token/token.service';
 import * as hashUtil from '@ab/utils/hash.util';
 import * as idUtil from '@ab/utils/id.util';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
@@ -31,6 +32,10 @@ const mockUserRepository = () => ({
   save: jest.fn(),
   delete: jest.fn(),
 });
+const mockTokenService = () => ({
+  generateToken: jest.fn(),
+  verifyToken: jest.fn(),
+});
 jest.mock('@ab/shared/utils/hash.util', () => ({
   hashText: jest.fn(),
   isValid: jest.fn(),
@@ -50,6 +55,7 @@ describe('new AuthenticationService()', () => {
       providers: [
         AuthenticationService,
         { provide: UserRepository, useFactory: mockUserRepository },
+        { provide: TokenService, useFactory: mockTokenService },
       ],
     }).compile();
 

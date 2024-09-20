@@ -96,6 +96,7 @@ describe('/api/authentication', () => {
         .expect(200)
         .expect((response) => {
           expect(response.body.token).toBeDefined();
+          expect(response.body.token.length).toBeGreaterThan(64);
         });
     });
   });
