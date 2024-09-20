@@ -6,16 +6,16 @@ import { LoginDto } from '../models/login.dto';
 import { RegisterDto } from '../models/register.dto';
 import { UserTokenDto } from '../models/user-token.dto';
 import { UserEntity } from '../models/user.entity';
-import { UserRepository } from './user.repository';
+import { UsersRepository } from './users.repository';
 
 /**
  * Service for the authentication logic
  */
 @Injectable()
-export class AuthenticationService {
-  private readonly logger = new Logger(AuthenticationService.name);
+export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
   constructor(
-    private readonly userRepository: UserRepository,
+    private readonly userRepository: UsersRepository,
     private readonly tokenService: TokenService,
   ) {}
 

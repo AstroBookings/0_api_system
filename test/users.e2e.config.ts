@@ -1,5 +1,5 @@
-import { LoginDto } from '@ab/api/authentication/models/login.dto';
-import { RegisterDto } from '@ab/api/authentication/models/register.dto';
+import { LoginDto } from '@ab/api/users/models/login.dto';
+import { RegisterDto } from '@ab/api/users/models/register.dto';
 
 export const inputRegisterUser: RegisterDto = {
   name: 'Test User',

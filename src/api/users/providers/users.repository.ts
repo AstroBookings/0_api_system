@@ -4,7 +4,7 @@ import { UserEntity } from '../models/user.entity';
 /**
  * Abstract class for user repository
  */
-export abstract class UserRepository {
+export abstract class UsersRepository {
   abstract findByEmail(email: string): Promise<UserEntity | undefined>;
   abstract save(user: UserEntity): Promise<void>;
   abstract delete(user: UserEntity): Promise<void>;
@@ -14,7 +14,7 @@ export abstract class UserRepository {
  * In-memory user repository implementation
  */
 @Injectable()
-export class InMemoryUserRepository extends UserRepository {
+export class InMemoryUsersRepository extends UsersRepository {
   private readonly users: UserEntity[] = [];
 
   async findByEmail(email: string): Promise<UserEntity | undefined> {

@@ -7,8 +7,8 @@ import { LoginDto } from '../models/login.dto';
 import { RegisterDto } from '../models/register.dto';
 import { UserTokenDto } from '../models/user-token.dto';
 import { UserEntity } from '../models/user.entity';
-import { AuthenticationService } from './authentication.service';
-import { UserRepository } from './user.repository';
+import { UsersRepository } from './users.repository';
+import { UsersService } from './users.service';
 
 // Arrange: Setup input data for tests
 const inputRegisterUser: RegisterDto = {
@@ -46,21 +46,21 @@ jest.mock('@ab/utils/id.util', () => ({
 
 describe('new AuthenticationService()', () => {
   // Arrange : declare variables
-  let service: AuthenticationService;
-  let userRepository: UserRepository;
+  let service: UsersService;
+  let usersRepository: UsersRepository;
 
   beforeEach(async () => {
     // Arrange : setup module and dependencies
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        AuthenticationService,
-        { provide: UserRepository, useFactory: mockUserRepository },
+        UsersService,
+        { provide: UsersRepository, useFactory: mockUserRepository },
         { provide: TokenService, useFactory: mockTokenService },
       ],
     }).compile();
 
-    service = module.get<AuthenticationService>(AuthenticationService);
-    userRepository = module.get<UserRepository>(UserRepository);
+    service = module.get<UsersService>(UsersService);
+    usersRepository = module.get<UsersRepository>(UsersRepository);
   });
 
   describe('.register(registerDto)', () => {
@@ -75,15 +75,15 @@ describe('new AuthenticationService()', () => {
         inputRegisterUser.role,
         mockHashedPassword,
       );
-      userRepository.findByEmail = jest.fn().mockResolvedValue(undefined);
-      userRepository.save = jest.fn().mockResolvedValue(undefined);
+      usersRepository.findByEmail = jest.fn().mockResolvedValue(undefined);
+      usersRepository.save = jest.fn().mockResolvedValue(undefined);
 
       // Act : execute the function
       const actualUserToken: UserTokenDto = await service.register(inputRegisterUser);
 
       // Assert : check the result
-      expect(userRepository.findByEmail).toHaveBeenCalledWith(inputRegisterUser.email);
-      expect(userRepository.save).toHaveBeenCalledWith(mockUserEntity);
+      expect(usersRepository.findByEmail).toHaveBeenCalledWith(inputRegisterUser.email);
+      expect(usersRepository.save).toHaveBeenCalledWith(mockUserEntity);
       expect(actualUserToken).toHaveProperty('token');
     });
 
@@ -96,7 +96,7 @@ describe('new AuthenticationService()', () => {
         inputRegisterUser.role,
         mockHashedPassword,
       );
-      userRepository.findByEmail = jest.fn().mockResolvedValue(mockExistingUser);
+      usersRepository.findByEmail = jest.fn().mockResolvedValue(mockExistingUser);
 
       // Act & Assert
       await expect(service.register(inputRegisterUser)).rejects.toThrow(ConflictException);
@@ -113,20 +113,20 @@ describe('new AuthenticationService()', () => {
         inputRegisterUser.role,
         mockHashedPassword,
       );
-      userRepository.findByEmail = jest.fn().mockResolvedValue(mockExistingUser);
+      usersRepository.findByEmail = jest.fn().mockResolvedValue(mockExistingUser);
       (hashUtil.isValid as jest.Mock).mockReturnValue(true);
 
       // Act
       const result: UserTokenDto = await service.login(inputLoginUser);
 
       // Assert
-      expect(userRepository.findByEmail).toHaveBeenCalledWith(inputLoginUser.email);
+      expect(usersRepository.findByEmail).toHaveBeenCalledWith(inputLoginUser.email);
       expect(result).toHaveProperty('token');
     });
 
     it('should throw UnauthorizedException if user not found', async () => {
       // Arrange
-      userRepository.findByEmail = jest.fn().mockResolvedValue(undefined);
+      usersRepository.findByEmail = jest.fn().mockResolvedValue(undefined);
 
       // Act & Assert
       await expect(service.login(inputLoginUser)).rejects.toThrow(UnauthorizedException);
@@ -141,7 +141,7 @@ describe('new AuthenticationService()', () => {
         inputRegisterUser.role,
         mockHashedPassword,
       );
-      userRepository.findByEmail = jest.fn().mockResolvedValue(mockExistingUser);
+      usersRepository.findByEmail = jest.fn().mockResolvedValue(mockExistingUser);
       (hashUtil.isValid as jest.Mock).mockReturnValue(false);
 
       // Act & Assert
@@ -159,16 +159,16 @@ describe('new AuthenticationService()', () => {
         inputRegisterUser.role,
         mockHashedPassword,
       );
-      userRepository.findByEmail = jest.fn().mockResolvedValue(mockExistingUser);
+      usersRepository.findByEmail = jest.fn().mockResolvedValue(mockExistingUser);
       (hashUtil.isValid as jest.Mock).mockReturnValue(true);
-      userRepository.delete = jest.fn().mockResolvedValue(undefined);
+      usersRepository.delete = jest.fn().mockResolvedValue(undefined);
 
       // Act
       await service.delete(inputLoginUser);
 
       // Assert
-      expect(userRepository.findByEmail).toHaveBeenCalledWith(inputLoginUser.email);
-      expect(userRepository.delete).toHaveBeenCalledWith(mockExistingUser);
+      expect(usersRepository.findByEmail).toHaveBeenCalledWith(inputLoginUser.email);
+      expect(usersRepository.delete).toHaveBeenCalledWith(mockExistingUser);
     });
 
     it('should throw UnauthorizedException if user not found', async () => {
@@ -177,7 +177,7 @@ describe('new AuthenticationService()', () => {
         email: inputLoginUser.email,
         password: inputLoginUser.password,
       };
-      userRepository.findByEmail = jest.fn().mockResolvedValue(undefined);
+      usersRepository.findByEmail = jest.fn().mockResolvedValue(undefined);
 
       // Act & Assert
       await expect(service.delete(loginDto)).rejects.toThrow(UnauthorizedException);
@@ -185,7 +185,7 @@ describe('new AuthenticationService()', () => {
 
     it('should throw UnauthorizedException if password is invalid', async () => {
       // Arrange
-      userRepository.findByEmail = jest.fn().mockResolvedValue(undefined);
+      usersRepository.findByEmail = jest.fn().mockResolvedValue(undefined);
 
       // Act & Assert
       await expect(service.delete(inputLoginUser)).rejects.toThrow(UnauthorizedException);

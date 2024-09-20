@@ -1,25 +1,17 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  Logger,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Logger, Post } from '@nestjs/common';
 import { LoginDto } from './models/login.dto';
 import { RegisterDto } from './models/register.dto';
 import { UserTokenDto } from './models/user-token.dto';
-import { AuthenticationService } from './providers/authentication.service';
+import { UsersService } from './providers/users.service';
 
 /**
- * Authentication controller for handling user registration and login
+ * Users controller for handling user registration, login and deletion
  */
-@Controller('api/authentication')
-export class AuthenticationController {
-  readonly #logger = new Logger(AuthenticationController.name);
+@Controller('api/users')
+export class UsersController {
+  readonly #logger = new Logger(UsersController.name);
 
-  constructor(private readonly authenticationService: AuthenticationService) {}
+  constructor(private readonly authenticationService: UsersService) {}
   /**
    * Ping endpoint to check if the authentication service is running
    *
@@ -67,7 +59,7 @@ export class AuthenticationController {
    *
    * 📦 void
    */
-  @Delete('user')
+  @Delete('')
   async delete(@Body() loginDto: LoginDto): Promise<void> {
     this.#logger.verbose(`Deleting user: ${loginDto.email}`);
     return this.authenticationService.delete(loginDto);
