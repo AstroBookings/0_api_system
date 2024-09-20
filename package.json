@@ -1,8 +1,11 @@
 {
   "name": "0_ab_system_api",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "The System API for AstroBookings",
+  "author": {
+    "name": "Alberto Basalo",
+    "email": "albertobasalo@hotmail.com"
+  },
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
