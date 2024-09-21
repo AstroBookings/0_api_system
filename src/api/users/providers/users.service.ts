@@ -1,7 +1,13 @@
-import { TokenService } from '@ab/shared/token/token.service';
 import { hashText, isValid } from '@ab/shared/utils/hash.util';
 import { generateId } from '@ab/shared/utils/id.util';
-import { ConflictException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { TokenService } from '@ab/token/token.service';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { LoginDto } from '../models/login.dto';
 import { RegisterDto } from '../models/register.dto';
 import { UserTokenDto } from '../models/user-token.dto';
@@ -38,7 +44,7 @@ export class UsersService {
       hashText(registerDto.password),
     );
     await this.userRepository.save(newUserEntity);
-    return this.createUserToken(newUserEntity);
+    return await this.createUserToken(newUserEntity);
   }
 
   /**
@@ -57,32 +63,25 @@ export class UsersService {
       this.logger.debug(`Invalid password for user: ${loginDto.email}`);
       throw new UnauthorizedException(`Unauthorized user: ${loginDto.email}`);
     }
-    return this.createUserToken(user);
+    return await this.createUserToken(user);
   }
 
   /**
    * Delete a user
    * @param loginDto - The user to delete
    */
-  async delete(loginDto: LoginDto): Promise<void> {
-    const user = await this.userRepository.findByEmail(loginDto.email);
-    if (!user) {
-      this.logger.debug(`User not found: ${loginDto.email}`);
-      throw new UnauthorizedException(`Unauthorized user: ${loginDto.email}`);
+  async delete(userId: string): Promise<void> {
+    const userEntity = await this.userRepository.findById(userId);
+    if (!userEntity) {
+      throw new NotFoundException(`User not found: ${userId}`);
     }
-    const isValidPassword = isValid(loginDto.password, user.password);
-    if (!isValidPassword) {
-      this.logger.debug(`Invalid password for user: ${loginDto.email}`);
-      throw new UnauthorizedException(`Unauthorized user: ${loginDto.email}`);
-    }
-    await this.userRepository.delete(user);
+
+    await this.userRepository.delete(userEntity);
   }
 
-  private createUserToken(user: UserEntity): UserTokenDto {
-    const token = this.tokenService.generateToken(user.id);
-    return {
-      user: user.toUser(),
-      token,
-    };
+  private async createUserToken(userEntity: UserEntity): Promise<UserTokenDto> {
+    const token = await this.tokenService.generateToken(userEntity.id);
+    const user = userEntity.toUser();
+    return { user, token };
   }
 }

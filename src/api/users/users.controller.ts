@@ -1,6 +1,10 @@
-import { Body, Controller, Delete, Get, HttpCode, Logger, Post } from '@nestjs/common';
+import { AuthApiKeyGuard } from '@ab/auth/auth-api-key.guard';
+import { AuthUserTokenGuard } from '@ab/auth/auth-user-token.guard';
+import { AuthUser } from '@ab/auth/auth-user.decorator';
+import { Body, Controller, Delete, Get, HttpCode, Logger, Post, UseGuards } from '@nestjs/common';
 import { LoginDto } from './models/login.dto';
 import { RegisterDto } from './models/register.dto';
+
 import { UserTokenDto } from './models/user-token.dto';
 import { UsersService } from './providers/users.service';
 
@@ -55,13 +59,15 @@ export class UsersController {
   }
 
   /**
-   * Delete a user
+   * Delete a user. Requires an API key and the user to be authenticated
    *
    * 📦 void
    */
   @Delete('')
-  async delete(@Body() loginDto: LoginDto): Promise<void> {
-    this.#logger.verbose(`Deleting user: ${loginDto.email}`);
-    return this.authenticationService.delete(loginDto);
+  @UseGuards(AuthApiKeyGuard)
+  @UseGuards(AuthUserTokenGuard)
+  async delete(@AuthUser() userId: string): Promise<void> {
+    this.#logger.verbose(`Deleting user: ${userId}`);
+    return this.authenticationService.delete(userId);
   }
 }

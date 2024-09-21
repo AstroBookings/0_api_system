@@ -57,11 +57,7 @@ export class LogFilter<T extends HttpException> implements ExceptionFilter {
     const { method, originalUrl }: source = request;
     const error: string = exception.message;
     const trace: string = exception.stack || '';
-    this.#logger.error(
-      `${method}:- ${originalUrl} ${error}`,
-      trace,
-      LogFilter.name,
-    );
+    this.#logger.error(`${method}:- ${originalUrl} ${error}`, trace, LogFilter.name);
     const nodeEnv: string | undefined = process.env.NODE_ENV;
     if (nodeEnv !== 'production') {
       this.#logger.debug(JSON.stringify(exception), LogFilter.name);
@@ -71,10 +67,7 @@ export class LogFilter<T extends HttpException> implements ExceptionFilter {
   #sendResponse(response: Response, status: number, exception: T): void {
     const body = {
       statusCode: status,
-      message:
-        exception['response']?.message ||
-        exception.message ||
-        'Internal server error',
+      message: exception['response']?.message || exception.message || 'Internal server error',
       timestamp: new Date().toISOString(),
     };
     response.status(status).json(body);

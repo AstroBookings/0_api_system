@@ -17,18 +17,37 @@ import { AppModule } from '../src/app.module';
 describe('/api/users', () => {
   let app: INestApplication;
   let http: TestAgent;
-  // Arrange Endpoints
   const usersUrl: string = '/api/users';
+
   // Arrange Setup
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      // .setLogger(console)
+      .compile();
     app = moduleFixture.createNestApplication();
+
     app.useGlobalPipes(new ValidationPipe(validationPipeOptions));
     await app.init();
     http = request(app.getHttpServer());
   });
+
+  async function cleanupUsers() {
+    let token;
+    let tryGetToken = await http.post(`${usersUrl}/register`).send(inputRegisterUser);
+    token = tryGetToken.body.token;
+    if (!token) {
+      tryGetToken = await http.post(`${usersUrl}/login`).send(inputLoginUser);
+      token = tryGetToken.body.token;
+    }
+    await http
+      .delete(`${usersUrl}/`)
+      .set('X-API-Key', 'secret')
+      .set('Authorization', `Bearer ${token}`)
+      .send()
+      .expect(200);
+  }
 
   describe('GET  /ping', () => {
     it('should return pong', async () => {
@@ -41,8 +60,7 @@ describe('/api/users', () => {
 
   describe('POST /register', () => {
     beforeEach(async () => {
-      // Arrange : clean up the state before each test
-      await http.delete(`${usersUrl}/`).send(inputRegisterUser);
+      await cleanupUsers();
     });
     it('should return 201 for valid input', async () => {
       // Act & Assert
@@ -62,9 +80,9 @@ describe('/api/users', () => {
 
   describe('POST /login', () => {
     beforeEach(async () => {
-      // Arrange : clean up the state before each test
-      await http.delete(`${usersUrl}/`).send(inputRegisterUser);
+      await cleanupUsers();
     });
+
     it('should return 200 for valid input', async () => {
       // Arrange : force the creation of a user
       await http.post(`${usersUrl}/register`).send(inputRegisterUser).expect(201);
@@ -97,6 +115,65 @@ describe('/api/users', () => {
         .expect((response) => {
           expect(response.body.token).toBeDefined();
           expect(response.body.token.length).toBeGreaterThan(64);
+        });
+    });
+  });
+
+  describe('DELETE /', () => {
+    beforeEach(async () => {
+      await cleanupUsers();
+    });
+    it('should return 200 for valid request and authenticated user', async () => {
+      // Arrange
+      const inputResponse = await http
+        .post(`${usersUrl}/register`)
+        .send(inputRegisterUser)
+        .expect(201);
+      // Act & Assert
+      await http
+        .delete(`${usersUrl}/`)
+        .set('X-API-Key', 'secret')
+        .set('Authorization', `Bearer ${inputResponse.body.token}`)
+        .send()
+        .expect(200);
+    });
+    it('should return 401 for Unauthorized user', async () => {
+      // Act & Assert
+      await http
+        .delete(`${usersUrl}/`)
+        .set('X-API-Key', 'secret')
+        .send()
+        .expect(401)
+        .expect((response) => {
+          expect(response.body.message).toBe('No token provided');
+        });
+    });
+    it('should return 401 for invalid token', async () => {
+      // Act & Assert
+      await http
+        .delete(`${usersUrl}/`)
+        .set('X-API-Key', 'secret')
+        .set('Authorization', `Bearer invalid`)
+        .send()
+        .expect(401)
+        .expect((response) => {
+          expect(response.body.message).toBe('Invalid token');
+        });
+    });
+    it('should return 401 for No api key', async () => {
+      // Arrange
+      const inputResponse = await http
+        .post(`${usersUrl}/register`)
+        .send(inputRegisterUser)
+        .expect(201);
+      // Act & Assert
+      await http
+        .delete(`${usersUrl}/`)
+        .set('Authorization', `Bearer ${inputResponse.body.token}`)
+        .send()
+        .expect(401)
+        .expect((response) => {
+          expect(response.body.message).toBe('API Key is missing');
         });
     });
   });

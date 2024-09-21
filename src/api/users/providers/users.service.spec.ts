@@ -1,7 +1,7 @@
 import { TokenService } from '@ab/shared/token/token.service';
 import * as hashUtil from '@ab/utils/hash.util';
 import * as idUtil from '@ab/utils/id.util';
-import { ConflictException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { LoginDto } from '../models/login.dto';
 import { RegisterDto } from '../models/register.dto';
@@ -149,9 +149,10 @@ describe('new AuthenticationService()', () => {
     });
   });
 
-  describe('.delete(loginDto)', () => {
-    it('should delete a user', async () => {
+  describe('.delete(userId)', () => {
+    it('should delete a user by id', async () => {
       // Arrange
+      const inputUserId = mockId;
       const mockExistingUser = new UserEntity(
         mockId,
         inputRegisterUser.name,
@@ -159,36 +160,24 @@ describe('new AuthenticationService()', () => {
         inputRegisterUser.role,
         mockHashedPassword,
       );
-      usersRepository.findByEmail = jest.fn().mockResolvedValue(mockExistingUser);
-      (hashUtil.isValid as jest.Mock).mockReturnValue(true);
+      usersRepository.findById = jest.fn().mockResolvedValue(mockExistingUser);
       usersRepository.delete = jest.fn().mockResolvedValue(undefined);
 
       // Act
-      await service.delete(inputLoginUser);
+      await service.delete(inputUserId);
 
       // Assert
-      expect(usersRepository.findByEmail).toHaveBeenCalledWith(inputLoginUser.email);
+      expect(usersRepository.findById).toHaveBeenCalledWith(inputUserId);
       expect(usersRepository.delete).toHaveBeenCalledWith(mockExistingUser);
     });
 
-    it('should throw UnauthorizedException if user not found', async () => {
+    it('should throw NotFoundException if user not found', async () => {
       // Arrange
-      const loginDto: LoginDto = {
-        email: inputLoginUser.email,
-        password: inputLoginUser.password,
-      };
-      usersRepository.findByEmail = jest.fn().mockResolvedValue(undefined);
+      const inputUserId = mockId;
+      usersRepository.findById = jest.fn().mockResolvedValue(undefined);
 
       // Act & Assert
-      await expect(service.delete(loginDto)).rejects.toThrow(UnauthorizedException);
-    });
-
-    it('should throw UnauthorizedException if password is invalid', async () => {
-      // Arrange
-      usersRepository.findByEmail = jest.fn().mockResolvedValue(undefined);
-
-      // Act & Assert
-      await expect(service.delete(inputLoginUser)).rejects.toThrow(UnauthorizedException);
+      await expect(service.delete(inputUserId)).rejects.toThrow(NotFoundException);
     });
   });
 });

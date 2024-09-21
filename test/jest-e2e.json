@@ -13,6 +13,7 @@
     "^@ab/utils/(.*)$": "<rootDir>/../src/shared/utils/$1",
     "^@ab/auth/(.*)$": "<rootDir>/../src/shared/auth/$1",
     "^@ab/shared/(.*)$": "<rootDir>/../src/shared/$1",
+    "^@ab/token/(.*)$": "<rootDir>/../src/shared/token/$1",
     "^@ab/src/(.*)$": "<rootDir>/../src/$1"
   }
 }

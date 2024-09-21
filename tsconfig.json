@@ -24,6 +24,7 @@
       "@ab/log/*": ["src/core/log/*"],
       "@ab/utils/*": ["src/shared/utils/*"],
       "@ab/auth/*": ["src/shared/auth/*"],
+      "@ab/token/*": ["src/shared/token/*"],
       "@ab/*": ["src/*"] // Added general path for all modules
     }
   }

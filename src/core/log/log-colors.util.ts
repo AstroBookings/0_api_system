@@ -16,14 +16,8 @@ const COLOR_CODES = {
 
 function getColorForStatusCode(statusCode: number): (text: string) => string {
   const category =
-    statusCode >= 500
-      ? 'serverError'
-      : statusCode >= 400
-        ? 'clientError'
-        : 'serverSuccess';
-  return (
-    COLOR_CODES[category as keyof typeof COLOR_CODES] || COLOR_CODES.default
-  );
+    statusCode >= 500 ? 'serverError' : statusCode >= 400 ? 'clientError' : 'serverSuccess';
+  return COLOR_CODES[category as keyof typeof COLOR_CODES] || COLOR_CODES.default;
 }
 
 function getColorForLogLevel(level: LogLevel): (text: string) => string {

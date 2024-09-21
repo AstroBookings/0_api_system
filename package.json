@@ -83,6 +83,7 @@
       "^@ab/log/(.*)$": "<rootDir>/core/log/$1",
       "^@ab/utils/(.*)$": "<rootDir>/shared/utils/$1",
       "^@ab/auth/(.*)$": "<rootDir>/shared/auth/$1",
+      "^@ab/token/(.*)$": "<rootDir>/shared/token/$1",
       "^@ab/(.*)$": "<rootDir>/$1"
     }
   }

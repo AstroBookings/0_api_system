@@ -6,6 +6,7 @@ import { UserEntity } from '../models/user.entity';
  */
 export abstract class UsersRepository {
   abstract findByEmail(email: string): Promise<UserEntity | undefined>;
+  abstract findById(id: string): Promise<UserEntity | undefined>;
   abstract save(user: UserEntity): Promise<void>;
   abstract delete(user: UserEntity): Promise<void>;
 }
@@ -15,20 +16,24 @@ export abstract class UsersRepository {
  */
 @Injectable()
 export class InMemoryUsersRepository extends UsersRepository {
-  private readonly users: UserEntity[] = [];
+  private static readonly users: UserEntity[] = [];
 
   async findByEmail(email: string): Promise<UserEntity | undefined> {
-    return this.users.find((user) => user.email === email);
+    return InMemoryUsersRepository.users.find((user) => user.email === email);
+  }
+
+  async findById(id: string): Promise<UserEntity | undefined> {
+    return InMemoryUsersRepository.users.find((user) => user.id === id);
   }
 
   async save(user: UserEntity): Promise<void> {
-    this.users.push(user);
+    InMemoryUsersRepository.users.push(user);
   }
 
   async delete(user: UserEntity): Promise<void> {
-    const index = this.users.indexOf(user);
+    const index = InMemoryUsersRepository.users.indexOf(user);
     if (index > -1) {
-      this.users.splice(index, 1);
+      InMemoryUsersRepository.users.splice(index, 1);
     }
   }
 }

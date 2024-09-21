@@ -1,7 +1,10 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from './token-payload.type';
-
+/**
+ * Service that provides methods to generate and validate JWT tokens.
+ * @remarks JwtService is used to sign and verify the tokens.
+ */
 @Injectable()
 export class TokenService {
   readonly #logger = new Logger(TokenService.name);
@@ -13,8 +16,8 @@ export class TokenService {
    * @param sub - The subject of the token.
    * @returns The generated JWT token.
    */
-  public generateToken(sub: string): string {
-    const token = this.jwtService.sign({ sub });
+  public async generateToken(sub: string): Promise<string> {
+    const token = await this.jwtService.signAsync({ sub });
     return token;
   }
 
@@ -23,9 +26,9 @@ export class TokenService {
    * @param token - The JWT token to validate.
    * @returns The decoded payload information.
    */
-  public validateToken(token: string): TokenPayload {
+  public async validateToken(token: string): Promise<TokenPayload> {
     try {
-      const decoded = this.jwtService.verify(token);
+      const decoded: TokenPayload = await this.jwtService.verifyAsync(token);
       return decoded;
     } catch (error) {
       this.#logger.verbose('Invalid token', token);
