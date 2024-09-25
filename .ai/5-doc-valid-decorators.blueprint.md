@@ -14,7 +14,7 @@ You are working on a configured NestJS project with the basic structure already 
 1. Install required packages:
 
    ```bash
-   npm install --save @nestjs/swagger swagger-ui-express class-validator class-transformer
+   npm install --save @nestjs/swagger class-validator class-transformer
    ```
 
 2. Update `nest-cli.json` to enable Swagger plugin:

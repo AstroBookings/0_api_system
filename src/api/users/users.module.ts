@@ -1,5 +1,4 @@
 import { TokenModule } from '@ab/token/token.module';
-import { TokenService } from '@ab/token/token.service';
 import { Module } from '@nestjs/common';
 import { UsersInMemoryRepository } from './users-in-memory.repository';
 import { UsersController } from './users.controller';
@@ -13,7 +12,6 @@ import { UsersService } from './users.service';
   imports: [TokenModule],
   controllers: [UsersController],
   providers: [
-    TokenService,
     UsersService,
     {
       provide: UsersRepository,
