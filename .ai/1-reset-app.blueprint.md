@@ -1,84 +1,62 @@
-## Reset NestJS app
+# Reset NestJS app
 
 ## Context
 
-You are working in a brand new NestJS project.
-
-Read this instruction and reset the app to a more production-ready state.
+You are working on a brand new NestJS project.
 
 ## Goal
 
-Configure the app to a more production-ready state.
+Follow these instructions to reset the app to a more production-ready state.
 
-## ResetInstructions
+## Instructions
 
-1. Add rule `endOfLine` auto to `.eslintrc.js`:
-2. Remove app controller and service with their spec files.
+1. Remove default controller and service with their spec files.
+
    - Remove files:
      - app.controller.spec.ts
      - app.controller.ts
      - app.service.spec.ts
      - app.service.ts
    - Update `AppModule` imports: remove `AppController`, `AppService`
-3. Add cls script to `package.json` and call it before all start and test executions. Do not add any comments. Respect JSON and npm syntax.
-4. Create main folders
 
-```
+2. Create main folders with the following structure:
+
+```text
 src/
   api/
   core/
     log/
   shared/
+    auth/
     token/
     utils/
 ```
 
-5. Add them to `tsconfig.json` as paths, using the prefix `@ab`.
-6. Add them to `package.json` as jest moduleNameMapper.
-7. Add them to `test/jest-e2e.json` as jest moduleNameMapper.
+5. Generate alias for the new folders.
+   - Add them to `tsconfig.json` as paths, using the prefix `@ab`.
+     > Example:
 
-## Application configuration
-
-1. Install `@nestjs/config` package.
-2. Generate a `src/core/app.bootstrap.util.ts` file with the following content:
-
-```typescript
-export const envFilePath = process.env.NODE_ENV === 'production' ? '.env' : '.env.local';
-
-export type AppConfig = {
-  host: string;
-  port: number;
-  appName: string;
-  appTitle: string;
-  appDescription: string;
-};
-
-export function getAppConfig(app: INestApplication): AppConfig {
-  const configService = app.get(ConfigService);
-  return {
-    host: configService.get<string>('APP_HOST') || 'localhost',
-    port: configService.get<number>('APP_PORT') || 3000,
-    appName: configService.get<string>('APP_NAME') || 'API',
-    appTitle: configService.get<string>('APP_TITLE') || 'A.P.I.',
-    appDescription: configService.get<string>('APP_DESCRIPTION') || 'The API.',
-  };
-}
+```json
+"paths": {
+      "@ab/api/*": ["src/api/*"],
+      "@ab/log/*": ["src/core/log/*"],
+      "@ab/auth/*": ["src/shared/auth/*"],
+      "@ab/token/*": ["src/shared/token/*"],
+      "@ab/utils/*": ["src/shared/utils/*"],
+      "@ab/*": ["src/*"]
+    }
 ```
 
-3. Configure `AppModule` to use `ConfigModule` with `CONFIG_OPTIONS`.
-4. Create at root level the `.env` and `.env.local` and `.env.example` files with the following content:
+- Add them to `package.json` and `test/jest-e2e.json` as jest moduleNameMapper.
+  > Example:
 
-```bash
-# Example environment variables
-NODE_ENV=development
-# App
-APP_HOST=http://localhost
-APP_PORT=3000
-APP_NAME=0_SystemAPI
-APP_TITLE=🚀 AstroBookings 👔 System API
-APP_DESCRIPTION=The API to authentication and monitor the system.
-# Log
-LOG_LEVEL=verbose
+```json
+"moduleNameMapper": {
+      "^@ab/api/(.*)$": "<rootDir>/api/$1",
+      "^@ab/log/(.*)$": "<rootDir>/core/log/$1",
+      "^@ab/auth/(.*)$": "<rootDir>/shared/auth/$1",
+      "^@ab/token/(.*)$": "<rootDir>/shared/token/$1",
+      "^@ab/utils/(.*)$": "<rootDir>/shared/utils/$1",
+      "^@ab/(.*)$": "<rootDir>/$1"
+    }
 ```
-
-5. Use `AppConfig.port` in `main.ts` to set the port for the app.
