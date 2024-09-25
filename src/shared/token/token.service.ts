@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from './token-payload.type';
 /**
  * Service that provides methods to generate and validate JWT tokens.
- * @remarks JwtService is used to sign and verify the tokens.
+ * @requires JwtService to sign and verify the tokens.
  */
 @Injectable()
 export class TokenService {
@@ -12,40 +12,27 @@ export class TokenService {
   constructor(private readonly jwtService: JwtService) {}
 
   /**
-   * Generates a JWT token for the given user.
-   * @param sub - The subject of the token.
+   * Generates a JWT token for the given subject.
+   * @param sub - The subject of the token (e.g. user ID)
    * @returns The generated JWT token.
    */
-  public async generateToken(sub: string): Promise<string> {
+  async generateToken(sub: string): Promise<string> {
     const token = await this.jwtService.signAsync({ sub });
     return token;
   }
 
   /**
-   * Validates a JWT token and returns the decoded user information.
+   * Validates a JWT token and returns the decoded information.
    * @param token - The JWT token to validate.
    * @returns The decoded payload information.
    */
-  public async validateToken(token: string): Promise<TokenPayload> {
+  async validateToken(token: string): Promise<TokenPayload> {
     try {
       const decoded: TokenPayload = await this.jwtService.verifyAsync(token);
+      this.#logger.verbose('Valid token', decoded);
       return decoded;
     } catch (error) {
-      this.#logger.verbose('Invalid token', token);
-      throw new UnauthorizedException(error);
-    }
-  }
-
-  /**
-   * Decodes a JWT token.
-   * @param token - The token to decode.
-   * @returns The decoded token payload.
-   */
-  public decodeToken(token: string): TokenPayload {
-    try {
-      return this.jwtService.decode(token) as TokenPayload;
-    } catch (error) {
-      this.#logger.verbose('Invalid token', token);
+      this.#logger.debug('Invalid token', token);
       throw new UnauthorizedException(error);
     }
   }
