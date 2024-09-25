@@ -78,8 +78,6 @@
     "preset": "ts-jest",
     "moduleNameMapper": {
       "^@ab/api/(.*)$": "<rootDir>/api/$1",
-      "^@ab/core/(.*)$": "<rootDir>/core/$1",
-      "^@ab/shared/(.*)$": "<rootDir>/shared/$1",
       "^@ab/log/(.*)$": "<rootDir>/core/log/$1",
       "^@ab/utils/(.*)$": "<rootDir>/shared/utils/$1",
       "^@ab/auth/(.*)$": "<rootDir>/shared/auth/$1",

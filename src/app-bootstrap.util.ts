@@ -1,15 +1,14 @@
 import { HttpStatus, INestApplication, ValidationPipeOptions } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { LogService } from './log/log.service';
 
 /**
- * The environment file path based on the current environment.
+ * Determines the environment file path based on the current NODE_ENV.
  */
 export const envFilePath = process.env.NODE_ENV === 'production' ? '.env' : '.env.local';
 
 /**
- * App configuration interface
+ * Application configuration settings.
  */
 export type AppConfig = {
   host: string;
@@ -20,9 +19,10 @@ export type AppConfig = {
 };
 
 /**
- * Get the app configuration
- * @param app The NestJS application
- * @returns The app configuration
+ * Retrieves the application configuration from the ConfigService.
+ *
+ * @param app - The NestJS application instance.
+ * @returns The application configuration object.
  */
 export function getAppConfig(app: INestApplication): AppConfig {
   const configService = app.get(ConfigService);
@@ -36,14 +36,12 @@ export function getAppConfig(app: INestApplication): AppConfig {
 }
 
 /**
- * Build the documentation for the API
- * @param app The NestJS application
+ * Builds and sets up Swagger documentation for the application.
+ *
+ * @param app - The NestJS application instance.
  */
-export const documentationBuilder = (
-  app: INestApplication,
-  appConfig: AppConfig,
-  logger: LogService,
-) => {
+export const buildSwaggerDocumentation = (app: INestApplication) => {
+  const appConfig = getAppConfig(app);
   const config = new DocumentBuilder()
     .addBearerAuth()
     .setTitle(appConfig.appTitle)
@@ -52,11 +50,10 @@ export const documentationBuilder = (
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
-  logger.log(`📚 ${appConfig.host}:${appConfig.port}/docs`, 'Bootstrap');
 };
 
 /**
- * Validation pipe options
+ * Configuration options for the global validation pipe.
  */
 export const validationPipeOptions: ValidationPipeOptions = {
   errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,

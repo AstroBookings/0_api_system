@@ -1,9 +1,10 @@
-import { TokenModule } from '@ab/shared/token/token.module';
-import { TokenService } from '@ab/shared/token/token.service';
+import { TokenModule } from '@ab/token/token.module';
+import { TokenService } from '@ab/token/token.service';
 import { Module } from '@nestjs/common';
-import { InMemoryUsersRepository, UsersRepository } from './providers/users.repository';
-import { UsersService } from './providers/users.service';
+import { UsersInMemoryRepository } from './users-in-memory.repository';
 import { UsersController } from './users.controller';
+import { UsersRepository } from './users.repository';
+import { UsersService } from './users.service';
 
 /**
  * Module for the authentication endpoints
@@ -12,12 +13,12 @@ import { UsersController } from './users.controller';
   imports: [TokenModule],
   controllers: [UsersController],
   providers: [
+    TokenService,
     UsersService,
     {
       provide: UsersRepository,
-      useClass: InMemoryUsersRepository,
+      useClass: UsersInMemoryRepository,
     },
-    TokenService,
   ],
 })
 export class UsersModule {}

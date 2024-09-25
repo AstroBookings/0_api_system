@@ -1,25 +1,41 @@
 import { LogLevel } from '@nestjs/common';
 import * as chalk from 'chalk';
 
+/**
+ * Defines color codes for different log categories.
+ * Maps categories to specific chalk styling functions.
+ */
 const COLOR_CODES = {
-  serverError: chalk.bgRed,
-  clientError: chalk.red,
-  serverSuccess: chalk.green,
-  error: chalk.red.bold,
-  warn: chalk.yellow.bold,
-  log: chalk.green,
-  verbose: chalk.gray,
-  debug: chalk.magenta,
-  default: chalk.dim,
-  dim: chalk.dim,
+  serverError: chalk.bgRed, // Background red for server errors
+  clientError: chalk.red, // Red for client errors
+  serverSuccess: chalk.green, // Green for successful server responses
+  error: chalk.red.bold, // Bold red for general errors
+  warn: chalk.yellow.bold, // Bold yellow for warnings
+  log: chalk.green, // Green for standard logs
+  verbose: chalk.gray, // Gray for verbose logs
+  debug: chalk.magenta, // Magenta for debug logs
+  default: chalk.dim, // Dim color for default messages
+  dim: chalk.dim, // Dim color for additional use
 };
 
+/**
+ * Determines the appropriate color function based on the HTTP status code.
+ *
+ * @param statusCode - The HTTP status code of the response.
+ * @returns A function that applies the determined color to a given text.
+ */
 function getColorForStatusCode(statusCode: number): (text: string) => string {
   const category =
     statusCode >= 500 ? 'serverError' : statusCode >= 400 ? 'clientError' : 'serverSuccess';
   return COLOR_CODES[category as keyof typeof COLOR_CODES] || COLOR_CODES.default;
 }
 
+/**
+ * Determines the appropriate color function based on the log level.
+ *
+ * @param level - The log level from NestJS.
+ * @returns A function that applies the determined color to a given text.
+ */
 function getColorForLogLevel(level: LogLevel): (text: string) => string {
   const colorMap: Record<string, (text: string) => string> = {
     error: COLOR_CODES.error,
@@ -28,34 +44,63 @@ function getColorForLogLevel(level: LogLevel): (text: string) => string {
     verbose: COLOR_CODES.verbose,
     debug: COLOR_CODES.debug,
   };
-  return colorMap[level as keyof typeof colorMap] || colorMap.default;
-}
-
-function wrapWithColor(text: string, color: (text: string) => string): string {
-  return color(text); // Apply color to text
-}
-
-export function wrapTimestampWithColor(timestamp: string): string {
-  return wrapWithColor(timestamp, COLOR_CODES.dim.italic); // Wrap timestamp with dim color
-}
-
-export function wrapContextWithColor(context: string, level: LogLevel): string {
-  const color = getColorForLogLevel(level); // Get color based on log
-  return wrapWithColor(`[${context}]`, color); // Wrap context with its color
-}
-
-export function wrapMessageWithColor(message: string, level: LogLevel): string {
-  const isLowLevel = level === 'debug' || level === 'verbose';
-  if (!isLowLevel) return message; // Return original message if not low level
-  return wrapWithColor(message, COLOR_CODES.dim); // Apply dim color to low level message
+  return colorMap[level as keyof typeof colorMap] || COLOR_CODES.default;
 }
 
 /**
- * Wraps the status code with the corresponding color
- * @param statusCode - The status code to wrap
- * @returns Text with the status code wrapped with the corresponding color
+ * Applies a color function to wrap the given text.
+ *
+ * @param text - The text to be colored.
+ * @param color - The color function to apply.
+ * @returns The colored text.
+ */
+function wrapWithColor(text: string, color: (text: string) => string): string {
+  return color(text);
+}
+
+/**
+ * Wraps the timestamp with a dim and italic style for consistent logging.
+ *
+ * @param timestamp - The timestamp string to be styled.
+ * @returns The styled timestamp.
+ */
+export function wrapTimestampWithColor(timestamp: string): string {
+  return wrapWithColor(timestamp, COLOR_CODES.dim.italic);
+}
+
+/**
+ * Wraps the context string with the appropriate color based on log level.
+ *
+ * @param context - The context or source of the log.
+ * @param level - The log level to determine styling.
+ * @returns The styled context string.
+ */
+export function wrapContextWithColor(context: string, level: LogLevel): string {
+  const color = getColorForLogLevel(level);
+  return wrapWithColor(`[${context}]`, color);
+}
+
+/**
+ * Wraps the log message with color based on its log level.
+ * High-level logs are left unchanged, while others are dimmed.
+ *
+ * @param message - The log message to be styled.
+ * @param level - The log level to determine styling.
+ * @returns The styled or original message.
+ */
+export function wrapMessageWithColor(message: string, level: LogLevel): string {
+  const isHighLevel = ['log', 'warn', 'error'].includes(level);
+  if (isHighLevel) return message;
+  return wrapWithColor(message, COLOR_CODES.dim);
+}
+
+/**
+ * Wraps the HTTP status code with a color based on its category.
+ *
+ * @param statusCode - The HTTP status code to be styled.
+ * @returns The styled status code as a string.
  */
 export function wrapStatusWithColor(statusCode: number): string {
-  const color = getColorForStatusCode(statusCode); // Get color based on status code
-  return wrapWithColor(statusCode.toString(), color); // Wrap status code with the corresponding color
+  const color = getColorForStatusCode(statusCode);
+  return wrapWithColor(statusCode.toString(), color);
 }

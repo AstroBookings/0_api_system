@@ -1,4 +1,4 @@
-import { Injectable, LoggerService, LogLevel } from '@nestjs/common';
+import { Injectable, LoggerService, LogLevel, Scope } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   wrapContextWithColor,
@@ -10,14 +10,13 @@ import {
  * Custom logging implementation of the LoggerService interface
  * @description To be used in the main.ts file during the app bootstrap
  */
-@Injectable()
+@Injectable({ scope: Scope.TRANSIENT })
 export class LogService implements LoggerService {
   private readonly logLevel: LogLevel;
 
   constructor(private readonly configService: ConfigService) {
-    const logLevel = this.configService.get<string>('LOG_LEVEL') as LogLevel;
-    this.logLevel = logLevel || 'log';
-    this.log(`Current log level: ${this.logLevel}`, 'LogService');
+    this.logLevel = this.configService.get<string>('LOG_LEVEL') as LogLevel;
+    this.log(`Initialized with log level: ${this.logLevel}`, 'LogService');
   }
 
   error(message: string, context?: string): void {
@@ -40,30 +39,30 @@ export class LogService implements LoggerService {
   }
 
   #formatAndLog(level: LogLevel, message: string, context?: string): void {
-    if (this.#shouldExit(level)) return;
+    if (this.#shouldSkip(level)) return;
 
-    const timestamp = this.#getFormattedTimestamp();
+    const formattedTimestamp = this.#getFormattedTimestamp();
     const formattedContext = this.#getFormattedContext(level, context);
     const formattedMessage = wrapMessageWithColor(message, level);
 
-    console.log(`${timestamp} ${formattedContext} ${formattedMessage}`);
+    console.log(`${formattedTimestamp} ${formattedContext} ${formattedMessage}`);
   }
 
   #getFormattedTimestamp(): string {
     const now = new Date();
     const timestamp = now.toTimeString().split(' ')[0]; // HH:MM:SS
-    return wrapTimestampWithColor(timestamp); // Wrap timestamp with color
+    return wrapTimestampWithColor(timestamp);
   }
 
   #getFormattedContext(level: LogLevel, context?: string): string {
-    return context ? wrapContextWithColor(context, level) : ''; // Wrap context with color
+    return context ? wrapContextWithColor(context, level) : '';
   }
 
-  #shouldExit(level: LogLevel): boolean {
+  #shouldSkip(level: LogLevel): boolean {
     const levels: LogLevel[] = ['debug', 'verbose', 'log', 'warn', 'error'];
     const minLogLevel = levels.indexOf(this.logLevel);
     const levelIndex = levels.indexOf(level);
-    const shouldExit = levelIndex < minLogLevel;
-    return shouldExit;
+    const shouldSkip = levelIndex < minLogLevel;
+    return shouldSkip;
   }
 }

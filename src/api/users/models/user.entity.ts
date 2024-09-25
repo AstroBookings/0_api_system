@@ -1,5 +1,5 @@
 import { Role } from './role.enum';
-import { User } from './user.type';
+import { UserDto } from './user.dto';
 
 /**
  * The User entity representing a user in the system
@@ -13,7 +13,7 @@ export class UserEntity {
     readonly password: string,
   ) {}
 
-  toUser(): User {
+  toUser(): UserDto {
     return {
       id: this.id,
       name: this.name,

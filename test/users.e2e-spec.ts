@@ -7,12 +7,12 @@ import {
   unprocessableRegisterUser,
 } from './users.e2e.config';
 
-import { validationPipeOptions } from '@ab/core/app-bootstrap.util';
+import { validationPipeOptions } from '@ab/app-bootstrap.util';
+import { AppModule } from '@ab/app.module';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import TestAgent from 'supertest/lib/agent';
-import { AppModule } from '../src/app.module';
 
 describe('/api/users', () => {
   let app: INestApplication;
@@ -171,10 +171,32 @@ describe('/api/users', () => {
         .delete(`${usersUrl}/`)
         .set('Authorization', `Bearer ${inputResponse.body.token}`)
         .send()
-        .expect(401)
+        .expect(403)
         .expect((response) => {
           expect(response.body.message).toBe('API Key is missing');
         });
+    });
+  });
+
+  describe('GET /api/users/:id', () => {
+    beforeEach(async () => {
+      await cleanupUsers();
+    });
+    it('should return user details', async () => {
+      // Arrange
+      const inputResponse = await http.post(`${usersUrl}/register`).send(inputRegisterUser);
+      const inputId = inputResponse.body.user.id;
+
+      // Act & Assert
+      const response = await request(app.getHttpServer()).get(`/api/users/${inputId}`).expect(200);
+      expect(response.body.id).toBe(inputId);
+    });
+
+    it('should return 404 if user not found', async () => {
+      const inputId = 'nonexistent-id';
+      const response = await request(app.getHttpServer()).get(`/api/users/${inputId}`).expect(404);
+
+      expect(response.body.message).toBe(`User not found: ${inputId}`);
     });
   });
 });

@@ -3,10 +3,11 @@ import * as hashUtil from '@ab/utils/hash.util';
 import * as idUtil from '@ab/utils/id.util';
 import { ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { LoginDto } from '../models/login.dto';
-import { RegisterDto } from '../models/register.dto';
-import { UserTokenDto } from '../models/user-token.dto';
-import { UserEntity } from '../models/user.entity';
+import { LoginDto } from './models/login.dto';
+import { RegisterDto } from './models/register.dto';
+import { UserTokenDto } from './models/user-token.dto';
+import { UserDto } from './models/user.dto';
+import { UserEntity } from './models/user.entity';
 import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
 
@@ -178,6 +179,37 @@ describe('new AuthenticationService()', () => {
 
       // Act & Assert
       await expect(service.delete(inputUserId)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('.findById(userId)', () => {
+    it('should find a user by id', async () => {
+      // Arrange
+      const inputUserId = mockId;
+      const mockExistingUser = new UserEntity(
+        mockId,
+        inputRegisterUser.name,
+        inputLoginUser.email,
+        inputRegisterUser.role,
+        mockHashedPassword,
+      );
+      usersRepository.findById = jest.fn().mockResolvedValue(mockExistingUser);
+
+      // Act
+      const result: UserDto = await service.findById(inputUserId);
+
+      // Assert
+      expect(usersRepository.findById).toHaveBeenCalledWith(inputUserId);
+      expect(result).toEqual(mockExistingUser.toUser());
+    });
+
+    it('should throw NotFoundException if user not found', async () => {
+      // Arrange
+      const inputUserId = mockId;
+      usersRepository.findById = jest.fn().mockResolvedValue(undefined);
+
+      // Act & Assert
+      await expect(service.findById(inputUserId)).rejects.toThrow(NotFoundException);
     });
   });
 });

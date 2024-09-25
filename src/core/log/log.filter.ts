@@ -23,7 +23,7 @@ type source = {
  * @description It also sends a formatted response to the client.
  */
 @Catch(HttpException)
-export class LogFilter<T extends HttpException> implements ExceptionFilter {
+export class LogFilter implements ExceptionFilter {
   #logger: Logger = new Logger(LogFilter.name);
 
   /**
@@ -31,7 +31,7 @@ export class LogFilter<T extends HttpException> implements ExceptionFilter {
    * @param exception - The exception to catch.
    * @param host - The host to catch the exception.
    */
-  catch(exception: T, host: ArgumentsHost): void {
+  catch(exception: any, host: ArgumentsHost): void {
     const ctx: HttpContext = this.#getHttpContext(host);
     const status: number = this.#getStatus(exception);
     this.#logError(exception, ctx.request);
@@ -46,25 +46,22 @@ export class LogFilter<T extends HttpException> implements ExceptionFilter {
     };
   }
 
-  #getStatus(exception: T): number {
+  #getStatus(exception: any): number {
     if (exception instanceof HttpException) {
       return exception.getStatus();
     }
     return HttpStatus.INTERNAL_SERVER_ERROR;
   }
 
-  #logError(exception: T, request: Request): void {
+  #logError(exception: any, request: Request): void {
     const { method, originalUrl }: source = request;
     const error: string = exception.message;
     const trace: string = exception.stack || '';
-    this.#logger.error(`${method}:- ${originalUrl} ${error}`, trace, LogFilter.name);
-    const nodeEnv: string | undefined = process.env.NODE_ENV;
-    if (nodeEnv !== 'production') {
-      this.#logger.debug(JSON.stringify(exception), LogFilter.name);
-    }
+    this.#logger.error(`${method} ${originalUrl} ${error}`, LogFilter.name);
+    this.#logger.verbose(JSON.stringify({ exception, trace }));
   }
 
-  #sendResponse(response: Response, status: number, exception: T): void {
+  #sendResponse(response: Response, status: number, exception: any): void {
     const body = {
       statusCode: status,
       message: exception['response']?.message || exception.message || 'Internal server error',

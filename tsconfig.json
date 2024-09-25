@@ -19,8 +19,6 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@ab/api/*": ["src/api/*"],
-      "@ab/core/*": ["src/core/*"],
-      "@ab/shared/*": ["src/shared/*"],
       "@ab/log/*": ["src/core/log/*"],
       "@ab/utils/*": ["src/shared/utils/*"],
       "@ab/auth/*": ["src/shared/auth/*"],

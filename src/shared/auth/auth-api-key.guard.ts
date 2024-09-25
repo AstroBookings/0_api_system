@@ -1,9 +1,9 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   Logger,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
@@ -35,12 +35,12 @@ export class AuthApiKeyGuard implements CanActivate {
     const apiKey = request.header('X-API-Key');
 
     if (!apiKey) {
-      throw new UnauthorizedException('API Key is missing');
+      throw new ForbiddenException('API Key is missing');
     }
 
     if (apiKey !== validApiKey) {
       this.#logger.debug('Invalid API Key', apiKey, validApiKey);
-      throw new UnauthorizedException('Invalid API Key');
+      throw new ForbiddenException('Invalid API Key');
     }
 
     return true;

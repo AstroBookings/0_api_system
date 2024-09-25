@@ -1,15 +1,7 @@
-import {
-  AppConfig,
-  documentationBuilder,
-  getAppConfig,
-  validationPipeOptions,
-} from '@ab/core/app-bootstrap.util';
-import { logMiddleware } from '@ab/log/log.middleware';
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { AppConfig, buildSwaggerDocumentation, getAppConfig } from './app-bootstrap.util';
 import { AppModule } from './app.module';
 import { createLogger } from './core/log/log.factory';
-import { LogFilter } from './core/log/log.filter';
 
 /**
  * Bootstrap the application
@@ -17,15 +9,10 @@ import { LogFilter } from './core/log/log.filter';
  */
 async function bootstrap() {
   const logger = createLogger();
-  const app = await NestFactory.create(AppModule, {
-    cors: true,
-    logger,
-  });
+  const app = await NestFactory.create(AppModule, { cors: true, logger });
+  buildSwaggerDocumentation(app);
   const appConfig: AppConfig = getAppConfig(app);
-  app.use(logMiddleware);
-  app.useGlobalPipes(new ValidationPipe(validationPipeOptions));
-  app.useGlobalFilters(new LogFilter());
-  documentationBuilder(app, appConfig, logger);
+  logger.log(`📚 ${appConfig.host}:${appConfig.port}/docs`, 'Bootstrap');
   logger.log(`🚀 ${appConfig.host}:${appConfig.port}/api`, 'Bootstrap');
   await app.listen(appConfig.port);
 }
