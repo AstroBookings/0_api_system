@@ -19,8 +19,8 @@ export function logMiddleware(req: Request, res: Response, next: NextFunction) {
     const statusCode: number = res.statusCode;
     const statusCodeText = wrapStatusWithColor(statusCode);
     const contentLength: number = parseInt(res.get('content-length') || '0');
-    const contentKbText = convertToKB(contentLength);
-    const message = `${method} ${originalUrl} ${statusCodeText} ${contentKbText}`;
+    const contentText = convertToKB(contentLength);
+    const message = `${method} ${originalUrl} ${statusCodeText} ${contentText}`;
     new Logger('HTTP').verbose(message);
   });
 

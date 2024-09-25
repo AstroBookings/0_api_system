@@ -6,16 +6,20 @@ import * as chalk from 'chalk';
  * Maps categories to specific chalk styling functions.
  */
 const COLOR_CODES = {
-  serverError: chalk.bgRed, // Background red for server errors
-  clientError: chalk.red, // Red for client errors
-  serverSuccess: chalk.green, // Green for successful server responses
-  error: chalk.red.bold, // Bold red for general errors
-  warn: chalk.yellow.bold, // Bold yellow for warnings
-  log: chalk.green, // Green for standard logs
-  verbose: chalk.gray, // Gray for verbose logs
-  debug: chalk.magenta, // Magenta for debug logs
-  default: chalk.dim, // Dim color for default messages
-  dim: chalk.dim, // Dim color for additional use
+  serverError: chalk.redBright,
+  clientError: chalk.red,
+  serverSuccess: chalk.greenBright,
+
+  error: chalk.redBright.bold,
+  warn: chalk.red,
+
+  log: chalk.blue,
+
+  verbose: chalk.cyan,
+  debug: chalk.magenta,
+
+  default: chalk.dim,
+  dim: chalk.dim,
 };
 
 /**
@@ -71,11 +75,11 @@ export function wrapTimestampWithColor(timestamp: string): string {
 /**
  * Wraps the context string with the appropriate color based on log level.
  *
- * @param context - The context or source of the log.
  * @param level - The log level to determine styling.
+ * @param context - The context or source of the log.
  * @returns The styled context string.
  */
-export function wrapContextWithColor(context: string, level: LogLevel): string {
+export function wrapContextWithColor(level: LogLevel, context: string): string {
   const color = getColorForLogLevel(level);
   return wrapWithColor(`[${context}]`, color);
 }

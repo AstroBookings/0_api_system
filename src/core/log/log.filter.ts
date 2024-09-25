@@ -32,9 +32,10 @@ export class LogFilter implements ExceptionFilter {
    * @param host - The host to catch the exception.
    */
   catch(exception: any, host: ArgumentsHost): void {
+    this.#logger.debug(`catch ${exception.message}, ${exception.stack}`, LogFilter.name);
     const ctx: HttpContext = this.#getHttpContext(host);
     const status: number = this.#getStatus(exception);
-    this.#logError(exception, ctx.request);
+    this.#logError(exception, ctx.request, status);
     this.#sendResponse(ctx.response, status, exception);
   }
 
@@ -53,12 +54,14 @@ export class LogFilter implements ExceptionFilter {
     return HttpStatus.INTERNAL_SERVER_ERROR;
   }
 
-  #logError(exception: any, request: Request): void {
+  #logError(exception: any, request: Request, status: number): void {
     const { method, originalUrl }: source = request;
     const error: string = exception.message;
-    const trace: string = exception.stack || '';
-    this.#logger.error(`${method} ${originalUrl} ${error}`, LogFilter.name);
-    this.#logger.verbose(JSON.stringify({ exception, trace }));
+    if (status >= 500) {
+      this.#logger.error(`${method} ${originalUrl} ${error}`, LogFilter.name);
+    } else {
+      this.#logger.warn(`${method} ${originalUrl} ${error}`, LogFilter.name);
+    }
   }
 
   #sendResponse(response: Response, status: number, exception: any): void {

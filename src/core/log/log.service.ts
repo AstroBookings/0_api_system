@@ -1,3 +1,4 @@
+import { cleanText } from '@ab/utils/text-cleaner.util';
 import { Injectable, LoggerService, LogLevel, Scope } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -21,6 +22,8 @@ export class LogService implements LoggerService {
 
   error(message: string, context?: string): void {
     this.#formatAndLog('error', message, context);
+    const currentStack = new Error().stack;
+    this.debug(`currentStack: ${currentStack}`, 'LogService');
   }
   warn(message: string, context?: string): void {
     this.#formatAndLog('warn', message, context);
@@ -40,22 +43,18 @@ export class LogService implements LoggerService {
 
   #formatAndLog(level: LogLevel, message: string, context?: string): void {
     if (this.#shouldSkip(level)) return;
-
-    const formattedTimestamp = this.#getFormattedTimestamp();
-    const formattedContext = this.#getFormattedContext(level, context);
+    const cleanContext = context ? cleanText(context) : 'Unknown';
+    const formattedContext = wrapContextWithColor(level, cleanContext);
+    const formattedTimestamp = wrapTimestampWithColor(this.#getTimestamp());
     const formattedMessage = wrapMessageWithColor(message, level);
 
     console.log(`${formattedTimestamp} ${formattedContext} ${formattedMessage}`);
   }
 
-  #getFormattedTimestamp(): string {
+  #getTimestamp(): string {
     const now = new Date();
     const timestamp = now.toTimeString().split(' ')[0]; // HH:MM:SS
-    return wrapTimestampWithColor(timestamp);
-  }
-
-  #getFormattedContext(level: LogLevel, context?: string): string {
-    return context ? wrapContextWithColor(context, level) : '';
+    return timestamp;
   }
 
   #shouldSkip(level: LogLevel): boolean {
