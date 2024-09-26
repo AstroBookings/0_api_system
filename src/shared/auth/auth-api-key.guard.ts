@@ -24,25 +24,20 @@ export class AuthApiKeyGuard implements CanActivate {
    * @throws UnauthorizedException if the API key is missing or invalid.
    */
   canActivate(context: ExecutionContext): boolean {
-    const validApiKey = this.configService.get<string>('API_KEY');
-
-    if (!validApiKey) {
+    const expectedApiKey = this.configService.get<string>('API_KEY');
+    if (!expectedApiKey) {
       this.#logger.warn('API_KEY is not configured in the environment');
       return true;
     }
-
     const request = context.switchToHttp().getRequest<Request>();
-    const apiKey = request.header('X-API-Key');
-
-    if (!apiKey) {
+    const actualApiKey = request.header('X-API-Key');
+    if (!actualApiKey) {
       throw new ForbiddenException('API Key is missing');
     }
-
-    if (apiKey !== validApiKey) {
-      this.#logger.debug('Invalid API Key', apiKey, validApiKey);
+    if (actualApiKey !== expectedApiKey) {
+      this.#logger.debug('Invalid API Key', actualApiKey, expectedApiKey);
       throw new ForbiddenException('Invalid API Key');
     }
-
     return true;
   }
 }

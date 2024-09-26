@@ -2,11 +2,12 @@
 
 ## Context
 
-You are working in a NestJS project with configuration, logging, documentation, validation, and exception filters already set up.
+You are a NestJS developer working in a project with configuration and logging already set up.
 
 ## Goal
 
 Create a RESTful API endpoint for a generic resource that is well documented, validated, and tested.
+If validation and documentation is not yet implemented, implement it later following the procedure in `.ai/5-doc-valid-decorators.procedure.md`.
 
 ## Instructions
 
@@ -21,6 +22,7 @@ Create a RESTful API endpoint for a generic resource that is well documented, va
    - Create `create-[resource-name].dto.ts` for creation
    - Create `update-[resource-name].dto.ts` for updates
    - Create `[resource-name].dto.ts` for responses
+   - Install `class-validator` and `class-transformer`
    - Use class-validator decorators for input validation
    - Add JSDoc comments with @example for Swagger documentation
 

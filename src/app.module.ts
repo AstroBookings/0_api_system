@@ -1,12 +1,19 @@
 import { UsersModule } from '@ab/api/users/users.module';
-import { envFilePath, validationPipeOptions } from '@ab/app-bootstrap.util';
+import { envFilePath } from '@ab/config/config.util';
 import { LogFilter } from '@ab/log/log.filter';
 import { logMiddleware } from '@ab/log/log.middleware';
 import { LogModule } from '@ab/log/log.module';
-import { Logger, MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
+import {
+  HttpStatus,
+  Logger,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  ValidationPipe,
+  ValidationPipeOptions,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
-
 /**
  * Configuration options for the ConfigModule
  */
@@ -14,6 +21,15 @@ const CONFIG_OPTIONS = {
   envFilePath,
   isGlobal: true,
   cache: true,
+};
+
+/**
+ * Configuration options for the global validation pipe.
+ */
+const validationPipeOptions: ValidationPipeOptions = {
+  errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+  forbidNonWhitelisted: true,
+  transform: true,
 };
 
 /**

@@ -20,6 +20,7 @@
     "paths": {
       "@ab/api/*": ["src/api/*"],
       "@ab/log/*": ["src/core/log/*"],
+      "@ab/config/*": ["src/core/config/*"],
       "@ab/utils/*": ["src/shared/utils/*"],
       "@ab/auth/*": ["src/shared/auth/*"],
       "@ab/token/*": ["src/shared/token/*"],

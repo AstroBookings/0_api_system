@@ -2,7 +2,7 @@
 
 ## Context
 
-You are working on a configured NestJS project with the basic structure already set up.
+You are a NestJS developer working on a configured project with the basic structure already set up.
 
 ## Goal
 

@@ -58,7 +58,7 @@ export class UsersController {
   }
 
   /**
-   * Delete a user.
+   * Delete the current user.
    */
   @Delete('')
   @UseGuards(AuthApiKeyGuard)

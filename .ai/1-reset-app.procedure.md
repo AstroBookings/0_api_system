@@ -2,7 +2,7 @@
 
 ## Context
 
-You are working on a brand new NestJS project.
+You are a NestJS developer working on a brand new project.
 
 ## Goal
 
@@ -25,6 +25,7 @@ Follow these instructions to reset the app to a more production-ready state.
 src/
   api/
   core/
+    config/
     log/
   shared/
     auth/
@@ -40,6 +41,7 @@ src/
 "paths": {
       "@ab/api/*": ["src/api/*"],
       "@ab/log/*": ["src/core/log/*"],
+      "@ab/config/*": ["src/core/config/*"],
       "@ab/auth/*": ["src/shared/auth/*"],
       "@ab/token/*": ["src/shared/token/*"],
       "@ab/utils/*": ["src/shared/utils/*"],
@@ -54,6 +56,7 @@ src/
 "moduleNameMapper": {
       "^@ab/api/(.*)$": "<rootDir>/api/$1",
       "^@ab/log/(.*)$": "<rootDir>/core/log/$1",
+      "^@ab/config/(.*)$": "<rootDir>/core/config/$1",
       "^@ab/auth/(.*)$": "<rootDir>/shared/auth/$1",
       "^@ab/token/(.*)$": "<rootDir>/shared/token/$1",
       "^@ab/utils/(.*)$": "<rootDir>/shared/utils/$1",

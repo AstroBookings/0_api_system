@@ -1,7 +1,8 @@
+import { AppConfig, getAppConfig } from '@ab/config/config.util';
+import { createLogger } from '@ab/log/log.factory';
 import { NestFactory } from '@nestjs/core';
-import { AppConfig, buildSwaggerDocumentation, getAppConfig } from './app-bootstrap.util';
 import { AppModule } from './app.module';
-import { createLogger } from './core/log/log.factory';
+import { buildSwaggerDocumentation } from './swagger.util';
 
 /**
  * Bootstrap the application

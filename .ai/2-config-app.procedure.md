@@ -2,7 +2,7 @@
 
 ## Context
 
-You are working on a clean NestJS project.
+You are a NestJS developer working on reset clean project.
 
 ## Goal
 
@@ -11,7 +11,7 @@ Follow these instructions to configure the app.
 ## Instructions
 
 1. Install `@nestjs/config` package.
-2. Create a `src/core/app.bootstrap.util.ts` file with the following content:
+2. Create a `src/core/config/config.util.ts` file with the following content:
 
 ```typescript
 export const envFilePath = process.env.NODE_ENV === 'production' ? '.env' : '.env.local';

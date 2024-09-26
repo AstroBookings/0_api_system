@@ -79,6 +79,7 @@
     "moduleNameMapper": {
       "^@ab/api/(.*)$": "<rootDir>/api/$1",
       "^@ab/log/(.*)$": "<rootDir>/core/log/$1",
+      "^@ab/config/(.*)$": "<rootDir>/core/config/$1",
       "^@ab/utils/(.*)$": "<rootDir>/shared/utils/$1",
       "^@ab/auth/(.*)$": "<rootDir>/shared/auth/$1",
       "^@ab/token/(.*)$": "<rootDir>/shared/token/$1",

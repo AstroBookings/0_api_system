@@ -38,7 +38,7 @@ You are working on a configured NestJS project with the basic structure already 
    }
    ```
 
-3. Create or update `src/app-bootstrap.util.ts`:
+3. Create or update `src/swagger.util.ts`:
 
    - Add a function to set up Swagger documentation:
 
@@ -63,7 +63,7 @@ You are working on a configured NestJS project with the basic structure already 
    - Call the Swagger setup function:
 
      ```typescript
-     import { buildSwaggerDocumentation } from './app-bootstrap.util';
+     import { buildSwaggerDocumentation } from './swagger.util';
 
      async function bootstrap() {
        const app = await NestFactory.create(AppModule);
@@ -83,6 +83,9 @@ You are working on a configured NestJS project with the basic structure already 
    import { ApiProperty } from '@nestjs/swagger';
    import { IsEmail, IsString, MinLength } from 'class-validator';
 
+   /**
+    * The input data required to login a user
+    */
    export class LoginDto {
      /**
       * The email of the user
@@ -106,68 +109,47 @@ You are working on a configured NestJS project with the basic structure already 
 6. Add Swagger decorators to controllers:
 
    - Use `@ApiTags()` for controller grouping
-   - Use `@ApiOperation()` for endpoint descriptions
+   - Use `@ApiParam()` for parameter descriptions
    - Use `@ApiResponse()` for response descriptions
-     Example in `src/api/users/users.controller.ts`:
 
-   ```typescript
-   import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+```typescript
+   import { ApiParam, ApiOkResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 
-   @ApiTags('Users')
-   @Controller('api/users')
-   export class UsersController {
-     @Post('login')
-     @ApiOperation({ summary: 'User login' })
-     @ApiResponse({ status: 200, description: 'Login successful', type: UserTokenDto })
-     @ApiResponse({ status: 401, description: 'Unauthorized' })
-     async login(@Body() loginDto: LoginDto): Promise<UserTokenDto> {
-       // ... implementation
-     }
-   }
-   ```
+/**
+ * Get user information by ID.
+ */
+  @Get(':id')
+  @ApiParam({ name: 'id', type: String, description: 'The ID of the user' })
+  @ApiOkResponse({ type: UserDto, description: 'User details' })
+  @ApiNotFoundResponse({ description: 'Not found if the user does not exist' })
+  async getUserById(@Param('id') userId: string): Promise<UserDto> {
+  // ... implementation
+  }
+```
 
-7. Configure validation pipe in `main.ts`:
+7. Configure validation pipe in `AppModule`
 
-   ```typescript
-   import { ValidationPipe } from '@nestjs/common';
+```typescript
+const validationPipeOptions: ValidationPipeOptions = {
+  errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+  forbidNonWhitelisted: true,
+  transform: true,
+};
 
-   async function bootstrap() {
-     const app = await NestFactory.create(AppModule);
-     app.useGlobalPipes(
-       new ValidationPipe({
-         transform: true,
-         whitelist: true,
-         forbidNonWhitelisted: true,
-       }),
-     );
-     // ... other configurations
-   }
-   ```
+@Module({
+  providers: [
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe(validationPipeOptions),
+    },
+  ],
+})
+export class AppModule {}
+```
 
-8. Update `.env`, `.env.local`, and `.env.example` files:
-
-   - Add Swagger-related environment variables:
-     ```
-     SWAGGER_TITLE=Your API Title
-     SWAGGER_DESCRIPTION=Your API Description
-     ```
-
-9. Update `src/app-bootstrap.util.ts` to use environment variables:
-
-   ```typescript
-   export function getAppConfig(app: INestApplication): AppConfig {
-     const configService = app.get(ConfigService);
-     return {
-       // ... other config
-       swaggerTitle: configService.get<string>('SWAGGER_TITLE') || 'API Documentation',
-       swaggerDescription: configService.get<string>('SWAGGER_DESCRIPTION') || 'API Description',
-     };
-   }
-   ```
-
-10. Test the Swagger documentation:
-    - Start your application
-    - Navigate to `http://localhost:3000/docs` in your browser
-    - Verify that all endpoints and models are correctly documented
+8. Test the Swagger documentation:
+   - Start your application
+   - Navigate to `http://localhost:3000/docs` in your browser
+   - Verify that all endpoints and models are correctly documented
 
 Remember to follow NestJS best practices, use dependency injection, and maintain consistent naming conventions throughout the implementation.

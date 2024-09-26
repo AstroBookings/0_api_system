@@ -2,7 +2,7 @@
 
 ## Context
 
-You are working in a NestJS project, with configuration, logging and a working controller already set up.
+You are a NestJS developer working in a project with working controller already set up.
 
 ## Goal
 

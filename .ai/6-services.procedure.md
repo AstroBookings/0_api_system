@@ -42,6 +42,17 @@ Provide the in-memory repository in module configuration using DI
 
 5. Provide the in-memory repository in module configuration using DI
 
+```typescript
+@Module({
+  providers: [
+    {
+      provide: [resource-name]Repository,
+      useClass: [resource-name]InMemoryRepository,
+    },
+  ],
+})
+```
+
 6. Add JSDoc comments to the service and its public methods
 
 - Use `@description` to describe the service
@@ -52,10 +63,11 @@ Provide the in-memory repository in module configuration using DI
 
 7. Write unit tests for the service
 
-- Declare constants for input and mock data
-- Declare and configure mock functions and objects (repository, etc.)
+- Use a main `describe` block for the service with 'new Service()'
 - Use a `describe` block for each public methods '.method(param)'
 - Use an `it` block for each test case with 'should have behavior'
-- Comment with `// Arrange`, `// Act`, `// Assert` to clarify the code
-- Name variables with `input`, `mock`, `actual`, and `expected` prefixes to improve readability
 - Use `beforeEach` to setup the module and dependencies
+- Name variables with `input`, `mock`, `actual`, and `expected` prefixes to improve readability
+- Comment with `// Arrange`, `// Act`, `// Assert` to clarify the code
+- Declare constants for input and mock data.
+- Declare and configure mock functions and objects (repository, etc.)
