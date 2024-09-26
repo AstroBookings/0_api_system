@@ -24,15 +24,6 @@ const CONFIG_OPTIONS = {
 };
 
 /**
- * Configuration options for the global validation pipe.
- */
-const validationPipeOptions: ValidationPipeOptions = {
-  errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-  forbidNonWhitelisted: true,
-  transform: true,
-};
-
-/**
  * Instantiate the ConfigModule with the defined options
  */
 const configModule = ConfigModule.forRoot(CONFIG_OPTIONS);
@@ -47,6 +38,14 @@ const coreModules = [LogModule];
  */
 const apiModules = [UsersModule];
 
+/**
+ * Configuration options for the global validation pipe.
+ */
+const validationPipeOptions: ValidationPipeOptions = {
+  errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+  forbidNonWhitelisted: true,
+  transform: true,
+};
 /**
  * The root module of the application.
  * @description Imports core and API modules, sets up global pipes and filters.

@@ -1,21 +1,11 @@
 import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { AppConfig } from './config.type';
 
 /**
  * Determines the environment file path based on the current NODE_ENV.
  */
 export const envFilePath = process.env.NODE_ENV === 'production' ? '.env' : '.env.local';
-
-/**
- * Application configuration settings.
- */
-export type AppConfig = {
-  host: string;
-  port: number;
-  appName: string;
-  appTitle: string;
-  appDescription: string;
-};
 
 /**
  * Retrieves the application configuration from the ConfigService.
