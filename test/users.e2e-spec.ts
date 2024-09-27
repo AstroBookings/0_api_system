@@ -7,8 +7,7 @@ import {
   unprocessableRegisterUser,
 } from './users.e2e.config';
 
-import { validationPipeOptions } from '@ab/app-bootstrap.util';
-import { AppModule } from '@ab/app.module';
+import { AppModule, validationPipeOptions } from '@ab/app.module';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
@@ -157,10 +156,30 @@ describe('/api/users', () => {
         .send()
         .expect(401)
         .expect((response) => {
-          expect(response.body.message).toBe('Invalid token');
+          expect(response.body.message).toBe('jwt malformed');
         });
     });
-    it('should return 401 for No api key', async () => {
+    it.skip('should return 401 for expired token', async () => {
+      // Change the JWT_EXPIRES_IN to 1 second to make the test fail
+      // Skip otherwise
+      // Arrange: wait 3 seconds to let the token expire
+      const inputResponse = await http
+        .post(`${usersUrl}/register`)
+        .send(inputRegisterUser)
+        .expect(201);
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      // Act & Assert
+      await http
+        .delete(`${usersUrl}/`)
+        .set('X-API-Key', 'secret')
+        .set('Authorization', `Bearer ${inputResponse.body.token}`)
+        .send()
+        .expect(401)
+        .expect((response) => {
+          expect(response.body.message).toBe('jwt expired');
+        });
+    });
+    it('should return 403 for No api key', async () => {
       // Arrange
       const inputResponse = await http
         .post(`${usersUrl}/register`)
@@ -173,7 +192,7 @@ describe('/api/users', () => {
         .send()
         .expect(403)
         .expect((response) => {
-          expect(response.body.message).toBe('API Key is missing');
+          expect(response.body.message).toBe('x-api-key is missing in the header');
         });
     });
   });
@@ -188,13 +207,19 @@ describe('/api/users', () => {
       const inputId = inputResponse.body.user.id;
 
       // Act & Assert
-      const response = await request(app.getHttpServer()).get(`/api/users/${inputId}`).expect(200);
+      const response = await request(app.getHttpServer())
+        .get(`/api/users/${inputId}`)
+        .set('X-API-Key', 'secret')
+        .expect(200);
       expect(response.body.id).toBe(inputId);
     });
 
     it('should return 404 if user not found', async () => {
       const inputId = 'nonexistent-id';
-      const response = await request(app.getHttpServer()).get(`/api/users/${inputId}`).expect(404);
+      const response = await request(app.getHttpServer())
+        .get(`/api/users/${inputId}`)
+        .set('X-API-Key', 'secret')
+        .expect(404);
 
       expect(response.body.message).toBe(`User not found: ${inputId}`);
     });

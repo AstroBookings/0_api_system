@@ -63,12 +63,12 @@ export class UsersService {
   async login(loginDto: LoginDto): Promise<UserTokenDto> {
     const user = await this.userRepository.findByEmail(loginDto.email);
     if (!user) {
-      this.logger.debug(`User not found: ${loginDto.email}`);
+      this.logger.verbose(`User not found: ${loginDto.email}`);
       throw new UnauthorizedException(`Unauthorized user: ${loginDto.email}`);
     }
     const isValidPassword = isValid(loginDto.password, user.password);
     if (!isValidPassword) {
-      this.logger.debug(`Invalid password for user: ${loginDto.email}`);
+      this.logger.verbose(`Invalid password for user: ${loginDto.email}`);
       throw new UnauthorizedException(`Unauthorized user: ${loginDto.email}`);
     }
     return await this.createUserToken(user);

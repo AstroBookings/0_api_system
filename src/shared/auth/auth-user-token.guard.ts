@@ -22,13 +22,9 @@ export class AuthUserTokenGuard implements CanActivate {
       throw new UnauthorizedException('No token provided');
     }
 
-    try {
-      const payload = await this.tokenService.validateToken(token);
-      const userId = payload.sub;
-      request.userId = userId;
-      return true;
-    } catch (error) {
-      throw new UnauthorizedException('Invalid token');
-    }
+    const payload = await this.tokenService.validateToken(token);
+    const userId = payload.sub;
+    request.userId = userId;
+    return true;
   }
 }

@@ -32,8 +32,8 @@ export class TokenService {
       this.#logger.verbose('Valid token', decoded);
       return decoded;
     } catch (error) {
-      this.#logger.debug('Invalid token', token);
-      throw new UnauthorizedException(error);
+      this.#logger.verbose('Invalid token', error);
+      throw new UnauthorizedException(error.message);
     }
   }
 }

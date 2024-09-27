@@ -9,6 +9,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiParam,
+  ApiSecurity,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { LoginDto } from './models/login.dto';
@@ -64,6 +65,7 @@ export class UsersController {
   @UseGuards(AuthApiKeyGuard)
   @UseGuards(AuthUserTokenGuard)
   @HttpCode(200)
+  @ApiSecurity('apiKey')
   @ApiOkResponse({ description: 'Empty response upon successful deletion' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized if the user is not authenticated' })
   @ApiNotFoundResponse({ description: 'Not found if the user does not exist' })
@@ -75,6 +77,8 @@ export class UsersController {
    * Get user information by ID.
    */
   @Get(':id')
+  @UseGuards(AuthApiKeyGuard)
+  @ApiSecurity('apiKey')
   @ApiParam({ name: 'id', type: String, description: 'The ID of the user' })
   @ApiOkResponse({ type: UserDto, description: 'User details' })
   @ApiNotFoundResponse({ description: 'Not found if the user does not exist' })

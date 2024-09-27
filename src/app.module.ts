@@ -2,7 +2,6 @@ import { UsersModule } from '@ab/api/users/users.module';
 import { envFilePath } from '@ab/config/config.util';
 import { LogFilter } from '@ab/log/log.filter';
 import { logMiddleware } from '@ab/log/log.middleware';
-import { LogModule } from '@ab/log/log.module';
 import {
   HttpStatus,
   Logger,
@@ -14,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+
 /**
  * Configuration options for the ConfigModule
  */
@@ -29,11 +29,6 @@ const CONFIG_OPTIONS = {
 const configModule = ConfigModule.forRoot(CONFIG_OPTIONS);
 
 /**
- * Array of core modules to be imported
- */
-const coreModules = [LogModule];
-
-/**
  * Array of API modules to be imported
  */
 const apiModules = [UsersModule];
@@ -41,17 +36,18 @@ const apiModules = [UsersModule];
 /**
  * Configuration options for the global validation pipe.
  */
-const validationPipeOptions: ValidationPipeOptions = {
+export const validationPipeOptions: ValidationPipeOptions = {
   errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
   forbidNonWhitelisted: true,
   transform: true,
 };
+
 /**
  * The root module of the application.
  * @description Imports core and API modules, sets up global pipes and filters.
  */
 @Module({
-  imports: [configModule, ...coreModules, ...apiModules],
+  imports: [configModule, ...apiModules],
   providers: [
     {
       provide: APP_PIPE,
@@ -70,6 +66,6 @@ export class AppModule implements NestModule {
    */
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(logMiddleware).forRoutes('*');
-    new Logger('AppModule').log('AppModule initialized');
+    new Logger('AppModule').log('AppModule configured');
   }
 }

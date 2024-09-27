@@ -13,6 +13,6 @@ Create a token Module with an exported service to handle JWT token creation, val
 1. Install `@nestjs/jwt`
 2. Create a new module at `src/shared/token`
 3. Use the ConfigService to get the JWT secret and expiration time
-4. Register JwtModule with the secret and expiration time
+4. Register JwtModule with configuration by using an async factory.
 5. Create a TokenService that uses the `JwtService` to sign and verify tokens
 6. Export the TokenService

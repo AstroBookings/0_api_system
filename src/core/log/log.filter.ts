@@ -19,8 +19,8 @@ type source = {
 };
 
 /**
- * Filter that catches and logs all exceptions thrown in the application.
- * @description It also sends a formatted response to the client.
+ * Filter that catches all exceptions thrown in the application.
+ * @description It logs and sends a formatted response to the client.
  */
 @Catch(HttpException)
 export class LogFilter implements ExceptionFilter {
@@ -32,11 +32,12 @@ export class LogFilter implements ExceptionFilter {
    * @param host - The host to catch the exception.
    */
   catch(exception: any, host: ArgumentsHost): void {
-    this.#logger.debug(`catch ${exception.message}, ${exception.stack}`, LogFilter.name);
+    this.#logger.debug(`exception: ${exception.message}, ${exception.stack}`, LogFilter.name);
     const ctx: HttpContext = this.#getHttpContext(host);
     const status: number = this.#getStatus(exception);
-    this.#logError(exception, ctx.request, status);
-    this.#sendResponse(ctx.response, status, exception);
+    const errorMessage = this.#getErrorMessage(exception);
+    this.#logError(ctx.request, status, errorMessage);
+    this.#sendResponse(ctx.response, status, errorMessage);
   }
 
   #getHttpContext(host: ArgumentsHost): HttpContext {
@@ -54,22 +55,23 @@ export class LogFilter implements ExceptionFilter {
     return HttpStatus.INTERNAL_SERVER_ERROR;
   }
 
-  #logError(exception: any, request: Request, status: number): void {
+  #getErrorMessage(exception: any): string {
+    return exception['response']?.message || exception.message || 'Internal server error';
+  }
+
+  #logError(request: Request, status: number, message: string): void {
     const { method, originalUrl }: source = request;
-    const error: string = exception.message;
+    const logMessage = `${method} ${originalUrl} ${message}`;
     if (status >= 500) {
-      this.#logger.error(`${method} ${originalUrl} ${error}`, LogFilter.name);
+      this.#logger.error(logMessage, LogFilter.name);
     } else {
-      this.#logger.warn(`${method} ${originalUrl} ${error}`, LogFilter.name);
+      this.#logger.warn(logMessage, LogFilter.name);
     }
   }
 
-  #sendResponse(response: Response, status: number, exception: any): void {
-    const body = {
-      statusCode: status,
-      message: exception['response']?.message || exception.message || 'Internal server error',
-      timestamp: new Date().toISOString(),
-    };
-    response.status(status).json(body);
+  #sendResponse(response: Response, statusCode: number, message: string): void {
+    const timestamp = new Date().toISOString();
+    const body = { statusCode, message, timestamp };
+    response.status(statusCode).json(body);
   }
 }

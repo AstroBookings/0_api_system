@@ -30,9 +30,9 @@ export class AuthApiKeyGuard implements CanActivate {
       return true;
     }
     const request = context.switchToHttp().getRequest<Request>();
-    const actualApiKey = request.header('X-API-Key');
+    const actualApiKey = request.header('x-api-key');
     if (!actualApiKey) {
-      throw new ForbiddenException('API Key is missing');
+      throw new ForbiddenException('x-api-key is missing in the header');
     }
     if (actualApiKey !== expectedApiKey) {
       this.#logger.debug('Invalid API Key', actualApiKey, expectedApiKey);
