@@ -35,7 +35,7 @@ export class AuthApiKeyGuard implements CanActivate {
       throw new ForbiddenException('x-api-key is missing in the header');
     }
     if (actualApiKey !== expectedApiKey) {
-      this.#logger.debug('Invalid API Key', actualApiKey, expectedApiKey);
+      this.#logger.verbose('Invalid API Key', actualApiKey, expectedApiKey);
       throw new ForbiddenException('Invalid API Key');
     }
     return true;

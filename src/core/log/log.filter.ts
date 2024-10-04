@@ -32,7 +32,6 @@ export class LogFilter implements ExceptionFilter {
    * @param host - The host to catch the exception.
    */
   catch(exception: any, host: ArgumentsHost): void {
-    this.#logger.debug(`exception: ${exception.message}, ${exception.stack}`, LogFilter.name);
     const ctx: HttpContext = this.#getHttpContext(host);
     const status: number = this.#getStatus(exception);
     const errorMessage = this.#getErrorMessage(exception);

@@ -20,25 +20,51 @@ export class LogService implements LoggerService {
     this.log(`Initialized with log level: ${this.logLevel}`, 'LogService');
   }
 
+  /**
+   * For critical or unexpected errors that should not occur.
+   * @param message - The error message to log.
+   * @param context - Optional context information.
+   */
   error(message: string, context?: string): void {
     this.#formatAndLog('error', message, context);
     const currentStack = new Error().stack;
     this.debug(`currentStack: ${currentStack}`, 'LogService');
   }
+
+  /**
+   * For potential issues or expected errors that may impact functionality.
+   * @param message - The warning message to log.
+   * @param context - Optional context information.
+   */
   warn(message: string, context?: string): void {
     this.#formatAndLog('warn', message, context);
   }
 
+  /**
+   * For general information that should be logged.
+   * @param message - The log message to log.
+   * @param context - Optional context information.
+   */
   log(message: string, context?: string): void {
     this.#formatAndLog('log', message, context);
   }
 
-  debug(message: string, context?: string): void {
-    this.#formatAndLog('debug', message, context);
-  }
-
+  /**
+   * For detailed information of the inner working of the application.
+   * @param message - The verbose message to log.
+   * @param context - Optional context information.
+   */
   verbose(message: string, context?: string): void {
     this.#formatAndLog('verbose', message, context);
+  }
+
+  /**
+   * Intended for debugging purposes, (stack traces, variable values, etc.)
+   * @param message - The debug message to log.
+   * @param context - Optional context information.
+   */
+  debug(message: string, context?: string): void {
+    this.#formatAndLog('debug', message, context);
   }
 
   #formatAndLog(level: LogLevel, message: string, context?: string): void {
