@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { nonApiRoutesMiddleware } from './core/middleware/non-api-routes.middleware';
 
 /**
  * Configuration options for the ConfigModule
@@ -65,7 +66,7 @@ export class AppModule implements NestModule {
    * @param consumer - The MiddlewareConsumer to apply middleware
    */
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(logMiddleware).forRoutes('*');
+    consumer.apply(nonApiRoutesMiddleware).forRoutes('*').apply(logMiddleware).forRoutes('api/*');
     new Logger('AppModule').log('AppModule configured');
   }
 }
