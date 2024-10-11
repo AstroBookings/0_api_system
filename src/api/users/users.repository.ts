@@ -24,7 +24,7 @@ export abstract class UsersRepository {
    * @param user - The UserEntity to save or update
    * @returns A promise that resolves when the operation is complete
    */
-  abstract save(user: UserEntity): Promise<void>;
+  abstract save(user: UserEntity): Promise<UserEntity | undefined>;
 
   /**
    * Delete a user entity

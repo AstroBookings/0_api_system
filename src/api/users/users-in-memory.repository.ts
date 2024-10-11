@@ -34,8 +34,9 @@ export class UsersInMemoryRepository extends UsersRepository {
    * @param user - The UserEntity to save
    * @returns A promise that resolves when the user is saved
    */
-  async save(user: UserEntity): Promise<void> {
+  async save(user: UserEntity): Promise<UserEntity> {
     UsersInMemoryRepository.users.push(user);
+    return user;
   }
 
   /**

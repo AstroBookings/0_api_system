@@ -1,5 +1,3 @@
-import { hashText, isValid } from '@ab/shared/utils/hash.util';
-import { generateId } from '@ab/shared/utils/id.util';
 import { TokenService } from '@ab/token/token.service';
 import {
   ConflictException,
@@ -38,20 +36,14 @@ export class UsersService {
    * @throws ConflictException if the user already exists.
    */
   async register(registerDto: RegisterDto): Promise<UserTokenDto> {
-    const userExists = await this.userRepository.findByEmail(registerDto.email);
-    if (userExists) {
+    const alreadyExistingUser = await this.userRepository.findByEmail(registerDto.email);
+    if (alreadyExistingUser) {
       this.logger.warn(`User already exists: ${registerDto.email}`);
       throw new ConflictException('User already exists');
     }
-    const newUserEntity = new UserEntity(
-      generateId(),
-      registerDto.name,
-      registerDto.email,
-      registerDto.role,
-      hashText(registerDto.password),
-    );
-    await this.userRepository.save(newUserEntity);
-    return await this.createUserToken(newUserEntity);
+    const userEntity: UserEntity = UserEntity.fromDto(registerDto);
+    await this.userRepository.save(userEntity);
+    return await this.#mapToUserToken(userEntity);
   }
 
   /**
@@ -61,17 +53,16 @@ export class UsersService {
    * @throws UnauthorizedException if the user is not found or the password is invalid.
    */
   async login(loginDto: LoginDto): Promise<UserTokenDto> {
-    const user = await this.userRepository.findByEmail(loginDto.email);
-    if (!user) {
+    const userEntity = await this.userRepository.findByEmail(loginDto.email);
+    if (!userEntity) {
       this.logger.verbose(`User not found: ${loginDto.email}`);
       throw new UnauthorizedException(`Unauthorized user: ${loginDto.email}`);
     }
-    const isValidPassword = isValid(loginDto.password, user.password);
-    if (!isValidPassword) {
+    if (!userEntity.validate(loginDto.password)) {
       this.logger.verbose(`Invalid password for user: ${loginDto.email}`);
       throw new UnauthorizedException(`Unauthorized user: ${loginDto.email}`);
     }
-    return await this.createUserToken(user);
+    return await this.#mapToUserToken(userEntity);
   }
 
   /**
@@ -100,17 +91,12 @@ export class UsersService {
     if (!userEntity) {
       throw new NotFoundException(`User not found: ${userId}`);
     }
-    return userEntity.toUser();
+    return userEntity.toDto();
   }
 
-  /**
-   * Creates a user token.
-   * @param userEntity - The user entity for which to create a token.
-   * @returns A promise that resolves to a UserTokenDto containing the user and their token.
-   */
-  private async createUserToken(userEntity: UserEntity): Promise<UserTokenDto> {
+  async #mapToUserToken(userEntity: UserEntity): Promise<UserTokenDto> {
+    const user = userEntity.toDto();
     const token = await this.tokenService.generateToken(userEntity.id);
-    const user = userEntity.toUser();
     return { user, token };
   }
 }

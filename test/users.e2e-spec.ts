@@ -23,7 +23,7 @@ describe('/api/users', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-      // .setLogger(console)
+      .setLogger(console)
       .compile();
     app = moduleFixture.createNestApplication();
 

@@ -200,7 +200,7 @@ describe('new AuthenticationService()', () => {
 
       // Assert
       expect(usersRepository.findById).toHaveBeenCalledWith(inputUserId);
-      expect(result).toEqual(mockExistingUser.toUser());
+      expect(result).toEqual(mockExistingUser.toDto());
     });
 
     it('should throw NotFoundException if user not found', async () => {
