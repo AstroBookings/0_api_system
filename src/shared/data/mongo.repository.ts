@@ -59,4 +59,15 @@ export class MongoRepository {
     const { id, ...rest } = data;
     return { ...rest, _id };
   }
+
+  /**
+   * Converts a MongoDocument to a data object (with an id field)
+   * @param document - The MongoDocument to convert
+   * @returns A data object with an id field
+   */
+  mapFromDocument<T extends { id: string }>(document: MongoDocument<T>): T {
+    const id = this.mapFromObjectId(document._id);
+    const { _id, ...rest } = document;
+    return { id, ...rest } as unknown as T;
+  }
 }

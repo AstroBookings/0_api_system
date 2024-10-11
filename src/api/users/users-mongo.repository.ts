@@ -57,10 +57,9 @@ export class UsersMongoRepository extends UsersRepository {
     await this.collection.deleteOne({ _id });
   }
 
-  #mapFromMongo(user: MongoDocument<UserData> | null): UserEntity | undefined {
-    if (!user) return undefined;
-    const id = this.mongoService.mapFromObjectId(user._id);
-    const data = { id, ...user };
-    return UserEntity.fromData(data);
+  #mapFromMongo(userDocument: MongoDocument<UserData> | null): UserEntity | undefined {
+    if (!userDocument) return undefined;
+    const usersData = this.mongoService.mapFromDocument(userDocument);
+    return UserEntity.fromData(usersData);
   }
 }
