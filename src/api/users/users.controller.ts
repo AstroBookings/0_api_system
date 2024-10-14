@@ -23,7 +23,7 @@ import { UsersService } from './users.service';
  */
 @Controller('api/users')
 export class UsersController {
-  constructor(private readonly authenticationService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
 
   /**
    * Ping endpoint to verify service availability
@@ -43,7 +43,7 @@ export class UsersController {
   @ApiBadRequestResponse({ description: 'Bad request if the input is invalid' })
   @ApiConflictResponse({ description: 'Conflict if the email is already in use' })
   async register(@Body() registerDto: RegisterDto): Promise<UserTokenDto> {
-    return this.authenticationService.register(registerDto);
+    return this.usersService.register(registerDto);
   }
 
   /**
@@ -55,7 +55,7 @@ export class UsersController {
   @ApiBadRequestResponse({ description: 'Bad request if the input is invalid' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized if the email or password is incorrect' })
   async login(@Body() loginDto: LoginDto): Promise<UserTokenDto> {
-    return this.authenticationService.login(loginDto);
+    return this.usersService.login(loginDto);
   }
 
   /**
@@ -70,7 +70,7 @@ export class UsersController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized if the user is not authenticated' })
   @ApiNotFoundResponse({ description: 'Not found if the user does not exist' })
   async delete(@AuthUser() userId: string): Promise<void> {
-    return this.authenticationService.delete(userId);
+    return this.usersService.delete(userId);
   }
 
   /**
@@ -83,6 +83,6 @@ export class UsersController {
   @ApiOkResponse({ type: UserDto, description: 'User details' })
   @ApiNotFoundResponse({ description: 'Not found if the user does not exist' })
   async getUserById(@Param('id') userId: string): Promise<UserDto> {
-    return await this.authenticationService.findById(userId);
+    return await this.usersService.findById(userId);
   }
 }

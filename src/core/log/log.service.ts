@@ -25,10 +25,14 @@ export class LogService implements LoggerService {
    * @param message - The error message to log.
    * @param context - Optional context information.
    */
-  error(message: string, context?: string): void {
+  error(message: string, context?: string, other?: any): void {
     this.#formatAndLog('error', message, context);
-    const currentStack = new Error().stack;
-    this.debug(`currentStack: ${currentStack}`, 'LogService');
+    if (context && context.length > 100) {
+      this.debug(context, 'LogService');
+    } else {
+      const currentStack = new Error().stack;
+      this.debug(`currentStack: ${currentStack}`, 'LogService');
+    }
   }
 
   /**
@@ -69,7 +73,8 @@ export class LogService implements LoggerService {
 
   #formatAndLog(level: LogLevel, message: string, context?: string): void {
     if (this.#shouldSkip(level)) return;
-    const cleanContext = context ? cleanText(context) : 'Unknown';
+    if (!context) context = 'Unknown';
+    const cleanContext = cleanText(context);
     const formattedContext = wrapContextWithColor(level, cleanContext);
     const formattedTimestamp = wrapTimestampWithColor(this.#getTimestamp());
     const formattedMessage = wrapMessageWithColor(message, level);
