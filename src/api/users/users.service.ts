@@ -22,12 +22,14 @@ import { UsersRepository } from './users.repository';
  */
 @Injectable()
 export class UsersService {
-  private readonly logger = new Logger(UsersService.name);
+  readonly #logger = new Logger(UsersService.name);
 
   constructor(
     private readonly userRepository: UsersRepository,
     private readonly tokenService: TokenService,
-  ) {}
+  ) {
+    this.#logger.verbose('Initialized');
+  }
 
   /**
    * Registers a new user.
@@ -38,7 +40,7 @@ export class UsersService {
   async register(registerDto: RegisterDto): Promise<UserTokenDto> {
     const alreadyExistingUser = await this.userRepository.findByEmail(registerDto.email);
     if (alreadyExistingUser) {
-      this.logger.warn(`User already exists: ${registerDto.email}`);
+      this.#logger.warn(`User already exists: ${registerDto.email}`);
       throw new ConflictException('User already exists');
     }
     const userEntity: UserEntity = UserEntity.fromDto(registerDto);
@@ -55,11 +57,11 @@ export class UsersService {
   async login(loginDto: LoginDto): Promise<UserTokenDto> {
     const userEntity = await this.userRepository.findByEmail(loginDto.email);
     if (!userEntity) {
-      this.logger.verbose(`User not found: ${loginDto.email}`);
+      this.#logger.verbose(`User not found: ${loginDto.email}`);
       throw new UnauthorizedException(`Unauthorized user: ${loginDto.email}`);
     }
     if (!userEntity.validate(loginDto.password)) {
-      this.logger.verbose(`Invalid password for user: ${loginDto.email}`);
+      this.#logger.verbose(`Invalid password for user: ${loginDto.email}`);
       throw new UnauthorizedException(`Unauthorized user: ${loginDto.email}`);
     }
     return await this.#mapToUserToken(userEntity);

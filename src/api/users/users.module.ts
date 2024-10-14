@@ -14,11 +14,11 @@ import { UsersService } from './users.service';
   controllers: [UsersController],
   providers: [
     UsersService,
-    MongoRepository,
     {
       provide: UsersRepository,
       useClass: UsersMongoRepository,
     },
+    MongoRepository,
   ],
 })
 export class UsersModule {}

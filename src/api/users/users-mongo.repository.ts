@@ -1,5 +1,5 @@
 import { MongoDocument, MongoRepository } from '@ab/shared/data/mongo.repository';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { UserData, UserEntity } from './models/user.entity';
 import { UsersRepository } from './users.repository';
 
@@ -9,10 +9,12 @@ import { UsersRepository } from './users.repository';
  */
 @Injectable()
 export class UsersMongoRepository extends UsersRepository {
-  private collection = this.mongoService.db.collection<MongoDocument<UserData>>('users');
+  readonly #logger = new Logger(UsersMongoRepository.name);
+  readonly #collection = this.mongoService.db.collection<MongoDocument<UserData>>('users');
 
   constructor(private readonly mongoService: MongoRepository) {
     super();
+    this.#logger.verbose('Initialized');
   }
 
   /**
@@ -21,7 +23,7 @@ export class UsersMongoRepository extends UsersRepository {
    * @returns A promise that resolves to a UserEntity or undefined if not found
    */
   async findByEmail(email: string): Promise<UserEntity | undefined> {
-    const userDocument = await this.collection.findOne({ email });
+    const userDocument = await this.#collection.findOne({ email });
     return this.#mapFromMongo(userDocument);
   }
 
@@ -32,7 +34,7 @@ export class UsersMongoRepository extends UsersRepository {
    */
   async findById(id: string): Promise<UserEntity | undefined> {
     const _id = this.mongoService.mapToObjectId(id);
-    const userDocument = await this.collection.findOne({ _id });
+    const userDocument = await this.#collection.findOne({ _id });
     return this.#mapFromMongo(userDocument);
   }
 
@@ -43,7 +45,7 @@ export class UsersMongoRepository extends UsersRepository {
    */
   async save(user: UserEntity): Promise<UserEntity | undefined> {
     const userDocument = this.mongoService.mapToDocument(user);
-    await this.collection.insertOne(userDocument);
+    await this.#collection.insertOne(userDocument);
     return user;
   }
 
@@ -54,7 +56,7 @@ export class UsersMongoRepository extends UsersRepository {
    */
   async delete(user: UserEntity): Promise<void> {
     const _id = this.mongoService.mapToObjectId(user.id);
-    await this.collection.deleteOne({ _id });
+    await this.#collection.deleteOne({ _id });
   }
 
   #mapFromMongo(userDocument: MongoDocument<UserData> | null): UserEntity | undefined {

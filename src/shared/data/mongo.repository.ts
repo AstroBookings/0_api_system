@@ -1,23 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Db, MongoClient, ObjectId } from 'mongodb';
 
+type HasId = { id: string };
+type OmitId<T> = Omit<T, 'id'>;
+type Mongo_id = { _id: ObjectId };
 /**
  * A type representing a MongoDocument with an ObjectId and the id field removed
  */
-export type MongoDocument<T extends { id: string }> = Omit<T, 'id'> & {
-  _id: ObjectId;
-};
+export type MongoDocument<T extends HasId> = OmitId<T> & Mongo_id;
 
 /**
  * A service for interacting with MongoDB
  */
 @Injectable()
 export class MongoRepository {
-  private client: MongoClient;
+  readonly #logger = new Logger(MongoRepository.name);
+  readonly #client: MongoClient;
 
   public get db(): Db {
-    return this.client.db();
+    return this.#client.db();
   }
 
   constructor(private readonly configService: ConfigService) {
@@ -25,7 +27,8 @@ export class MongoRepository {
     if (!mongoUri) {
       throw new Error('MONGO_URI is not defined');
     }
-    this.client = new MongoClient(mongoUri);
+    this.#client = new MongoClient(mongoUri);
+    this.#logger.verbose(`Initialized at ${mongoUri}`);
   }
 
   /**
