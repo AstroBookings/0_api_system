@@ -8,8 +8,10 @@ import {
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiParam,
   ApiSecurity,
+  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { LoginDto } from './models/login.dto';
@@ -22,23 +24,20 @@ import { UsersService } from './users.service';
  * Controller for user-related operations
  */
 @Controller('api/users')
+@ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  /**
-   * Ping endpoint to verify service availability
-   */
   @Get('ping')
+  @ApiOperation({ summary: 'Ping endpoint to verify service availability' })
   @ApiOkResponse({ description: 'Pong text upon successful ping' })
   ping(): string {
     return 'pong';
   }
 
-  /**
-   * Register a new user.
-   */
   @Post('register')
   @HttpCode(201)
+  @ApiOperation({ summary: 'Register a new user' })
   @ApiCreatedResponse({ type: UserTokenDto, description: 'User token upon registration' })
   @ApiBadRequestResponse({ description: 'Bad request if the input is invalid' })
   @ApiConflictResponse({ description: 'Conflict if the email is already in use' })
@@ -46,11 +45,10 @@ export class UsersController {
     return await this.usersService.register(registerDto);
   }
 
-  /**
-   * Login a user.
-   */
+  @Post('login')
   @Post('login')
   @HttpCode(200)
+  @ApiOperation({ summary: 'Login a user' })
   @ApiOkResponse({ type: UserTokenDto, description: 'User token upon successful login' })
   @ApiBadRequestResponse({ description: 'Bad request if the input is invalid' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized if the email or password is incorrect' })
@@ -58,13 +56,11 @@ export class UsersController {
     return await this.usersService.login(loginDto);
   }
 
-  /**
-   * Delete the current user.
-   */
   @Delete('')
   @UseGuards(AuthApiKeyGuard)
   @UseGuards(AuthUserTokenGuard)
   @HttpCode(200)
+  @ApiOperation({ summary: 'Delete the current user' })
   @ApiSecurity('apiKey')
   @ApiOkResponse({ description: 'Empty response upon successful deletion' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized if the user is not authenticated' })
@@ -73,11 +69,9 @@ export class UsersController {
     return await this.usersService.delete(userId);
   }
 
-  /**
-   * Get user information by ID.
-   */
   @Get(':id')
   @UseGuards(AuthApiKeyGuard)
+  @ApiOperation({ summary: 'Get user information by ID' })
   @ApiSecurity('apiKey')
   @ApiParam({ name: 'id', type: String, description: 'The ID of the user' })
   @ApiOkResponse({ type: UserDto, description: 'User details' })

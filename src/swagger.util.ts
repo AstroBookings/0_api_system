@@ -22,6 +22,7 @@ export const buildSwaggerDocumentation = (app: INestApplication) => {
     )
     .setTitle(appConfig.appTitle)
     .setDescription(appConfig.appDescription)
+    .addTag('users', 'API for managing users')
     .build();
   const openApiDocument = SwaggerModule.createDocument(app, openApiConfig);
   const path = 'docs';
