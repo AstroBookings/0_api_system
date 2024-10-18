@@ -17,6 +17,8 @@ export type UserData = {
 
 /**
  * The User entity with data and methods to handle logic
+ * It is decoupled from the database and the controller
+ * No Mongo, no Nest, no framework specific stuff
  */
 export class UserEntity implements UserData {
   constructor(

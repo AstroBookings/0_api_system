@@ -27,7 +27,7 @@ const inputLoginUser: LoginDto = {
 const mockId: string = 'user_1';
 const mockHashedPassword: string = 'hashed_password';
 
-// Arrange: Setup mock functions for tests
+// Arrange: Setup mock dependencies
 const mockUserRepository = () => ({
   findByEmail: jest.fn(),
   save: jest.fn(),
@@ -37,6 +37,7 @@ const mockTokenService = () => ({
   generateToken: jest.fn(),
   verifyToken: jest.fn(),
 });
+// Arrange: Setup mock functions
 jest.mock('@ab/shared/utils/hash.util', () => ({
   hashText: jest.fn(),
   isValid: jest.fn(),
@@ -46,7 +47,7 @@ jest.mock('@ab/utils/id.util', () => ({
 }));
 
 describe('new AuthenticationService()', () => {
-  // Arrange : declare variables
+  // Arrange : declare variables for SUT and main dependencies
   let service: UsersService;
   let usersRepository: UsersRepository;
 
@@ -66,30 +67,30 @@ describe('new AuthenticationService()', () => {
 
   describe('.register(registerDto)', () => {
     it('should register a new user and return a token', async () => {
-      // Arrange : setup mock functions
+      // Arrange : setup mock functions with expected values
       (idUtil.generateId as jest.Mock).mockReturnValue(mockId);
       (hashUtil.hashText as jest.Mock).mockReturnValue(mockHashedPassword);
-      const mockUserEntity = new UserEntity(
+      usersRepository.findByEmail = jest.fn().mockResolvedValue(undefined);
+      usersRepository.save = jest.fn().mockResolvedValue(undefined);
+      // Arrange : setup expected user entity
+      const expectedUserEntity = new UserEntity(
         mockId,
         inputRegisterUser.name,
         inputRegisterUser.email,
         inputRegisterUser.role,
         mockHashedPassword,
       );
-      usersRepository.findByEmail = jest.fn().mockResolvedValue(undefined);
-      usersRepository.save = jest.fn().mockResolvedValue(undefined);
-
       // Act : execute the function
       const actualUserToken: UserTokenDto = await service.register(inputRegisterUser);
-
-      // Assert : check the result
+      // Assert : check the sut do the proper calls
       expect(usersRepository.findByEmail).toHaveBeenCalledWith(inputRegisterUser.email);
-      expect(usersRepository.save).toHaveBeenCalledWith(mockUserEntity);
+      expect(usersRepository.save).toHaveBeenCalledWith(expectedUserEntity);
+      // Assert : check the result
       expect(actualUserToken).toHaveProperty('token');
     });
 
     it('should throw ConflictException if user already exists', async () => {
-      // Arrange
+      // Arrange: setup mock functions with expected values
       const mockExistingUser = new UserEntity(
         mockId,
         inputRegisterUser.name,
@@ -99,14 +100,14 @@ describe('new AuthenticationService()', () => {
       );
       usersRepository.findByEmail = jest.fn().mockResolvedValue(mockExistingUser);
 
-      // Act & Assert
+      // Act & Assert that the function throws an error
       await expect(service.register(inputRegisterUser)).rejects.toThrow(ConflictException);
     });
   });
 
   describe('.login(loginDto)', () => {
     it('should login a user and return a token', async () => {
-      // Arrange
+      // Arrange: setup mock functions with expected values
       const mockExistingUser = new UserEntity(
         mockId,
         inputRegisterUser.name,
@@ -120,13 +121,14 @@ describe('new AuthenticationService()', () => {
       // Act
       const result: UserTokenDto = await service.login(inputLoginUser);
 
-      // Assert
+      // Assert: check the sut do the proper calls
       expect(usersRepository.findByEmail).toHaveBeenCalledWith(inputLoginUser.email);
+      // Assert: check the result
       expect(result).toHaveProperty('token');
     });
 
     it('should throw UnauthorizedException if user not found', async () => {
-      // Arrange
+      // Arrange: setup mock functions for not found user
       usersRepository.findByEmail = jest.fn().mockResolvedValue(undefined);
 
       // Act & Assert
@@ -134,7 +136,7 @@ describe('new AuthenticationService()', () => {
     });
 
     it('should throw UnauthorizedException if password is invalid', async () => {
-      // Arrange
+      // Arrange : setup mock functions with expected values
       const mockExistingUser = new UserEntity(
         mockId,
         inputRegisterUser.name,
@@ -145,14 +147,14 @@ describe('new AuthenticationService()', () => {
       usersRepository.findByEmail = jest.fn().mockResolvedValue(mockExistingUser);
       (hashUtil.isValid as jest.Mock).mockReturnValue(false);
 
-      // Act & Assert
+      // Act & Assert that the function throws an error
       await expect(service.login(inputLoginUser)).rejects.toThrow(UnauthorizedException);
     });
   });
 
   describe('.delete(userId)', () => {
     it('should delete a user by id', async () => {
-      // Arrange
+      // Arrange : setup mock functions with expected values
       const inputUserId = mockId;
       const mockExistingUser = new UserEntity(
         mockId,
@@ -164,7 +166,7 @@ describe('new AuthenticationService()', () => {
       usersRepository.findById = jest.fn().mockResolvedValue(mockExistingUser);
       usersRepository.delete = jest.fn().mockResolvedValue(undefined);
 
-      // Act
+      // Act : execute the function
       await service.delete(inputUserId);
 
       // Assert
@@ -173,18 +175,18 @@ describe('new AuthenticationService()', () => {
     });
 
     it('should throw NotFoundException if user not found', async () => {
-      // Arrange
+      // Arrange : setup mock functions for not found user
       const inputUserId = mockId;
       usersRepository.findById = jest.fn().mockResolvedValue(undefined);
 
-      // Act & Assert
+      // Act & Assert that the function throws an error
       await expect(service.delete(inputUserId)).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('.findById(userId)', () => {
     it('should find a user by id', async () => {
-      // Arrange
+      // Arrange : setup mock functions with expected values
       const inputUserId = mockId;
       const mockExistingUser = new UserEntity(
         mockId,
@@ -195,20 +197,21 @@ describe('new AuthenticationService()', () => {
       );
       usersRepository.findById = jest.fn().mockResolvedValue(mockExistingUser);
 
-      // Act
+      // Act : execute the function
       const result: UserDto = await service.findById(inputUserId);
 
-      // Assert
+      // Assert: check the sut do the proper calls
       expect(usersRepository.findById).toHaveBeenCalledWith(inputUserId);
+      // Assert: check the result
       expect(result).toEqual(mockExistingUser.toDto());
     });
 
     it('should throw NotFoundException if user not found', async () => {
-      // Arrange
+      // Arrange : setup mock functions for not found user
       const inputUserId = mockId;
       usersRepository.findById = jest.fn().mockResolvedValue(undefined);
 
-      // Act & Assert
+      // Act & Assert that the function throws an error
       await expect(service.findById(inputUserId)).rejects.toThrow(NotFoundException);
     });
   });

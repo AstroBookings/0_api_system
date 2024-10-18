@@ -16,7 +16,6 @@ import { UsersRepository } from './users.repository';
 /**
  * Service for managing user-related operations.
  * Handles user registration, login, and deletion.
- * Utilizes UsersRepository for data persistence and TokenService for token generation.
  * @requires UsersRepository - Repository for user data persistence.
  * @requires TokenService - Service for token generation.
  */
@@ -78,7 +77,6 @@ export class UsersService {
     if (!userEntity) {
       throw new NotFoundException(`User not found: ${userId}`);
     }
-
     await this.userRepository.delete(userEntity);
   }
 

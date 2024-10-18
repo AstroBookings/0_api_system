@@ -43,7 +43,7 @@ export class UsersController {
   @ApiBadRequestResponse({ description: 'Bad request if the input is invalid' })
   @ApiConflictResponse({ description: 'Conflict if the email is already in use' })
   async register(@Body() registerDto: RegisterDto): Promise<UserTokenDto> {
-    return this.usersService.register(registerDto);
+    return await this.usersService.register(registerDto);
   }
 
   /**
@@ -55,7 +55,7 @@ export class UsersController {
   @ApiBadRequestResponse({ description: 'Bad request if the input is invalid' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized if the email or password is incorrect' })
   async login(@Body() loginDto: LoginDto): Promise<UserTokenDto> {
-    return this.usersService.login(loginDto);
+    return await this.usersService.login(loginDto);
   }
 
   /**
@@ -70,7 +70,7 @@ export class UsersController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized if the user is not authenticated' })
   @ApiNotFoundResponse({ description: 'Not found if the user does not exist' })
   async delete(@AuthUser() userId: string): Promise<void> {
-    return this.usersService.delete(userId);
+    return await this.usersService.delete(userId);
   }
 
   /**

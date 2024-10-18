@@ -20,7 +20,7 @@
     "test:watch": "npm run cls && jest --watch",
     "test:cov": "npm run cls && jest --coverage",
     "test:debug": "npm run cls && node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "npm run cls && jest --config ./test/jest-e2e.json",
+    "test:e2e": "npm run cls && jest  --detectOpenHandles --config ./test/jest-e2e.json",
     "cls": "cls"
   },
   "dependencies": {
