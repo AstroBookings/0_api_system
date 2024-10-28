@@ -21,6 +21,7 @@
     "test:cov": "npm run cls && jest --coverage",
     "test:debug": "npm run cls && node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "npm run cls && jest  --detectOpenHandles --config ./test/jest-e2e.json",
+    "test:api": "npm run cls && jest --detectOpenHandles --config ./test/jest-api.json",
     "cls": "cls"
   },
   "dependencies": {
